@@ -1,5 +1,7 @@
 import flet as ft
 
+from src.views.bienvenida import Bienvenida
+
 def index(pagina: ft.Page):
     pagina.title = "Malabunda"
     pagina.theme_mode = ft.ThemeMode.DARK
@@ -7,13 +9,7 @@ def index(pagina: ft.Page):
     def enrutador(e):
         pagina.views.clear()
 
-        if pagina.route == "/":
-            pagina.views.append(
-                ft.View(
-                    route="/",
-                    controls=[ft.Text(value="Home", size=35)]
-                )
-            )
+        if pagina.route == "/": pagina.views.append(Bienvenida(pagina))
 
         pagina.update()
 

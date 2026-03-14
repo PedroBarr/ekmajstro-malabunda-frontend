@@ -9,7 +9,7 @@ def Bienvenida(pagina: ft.Page):
                     ft.Column(
                         [
                             ft.Text(
-                                "Bienvenido al Sistema Malabunda",
+                                "Bienvenido al Sistema " + pagina.title,
                                 size=30,
                                 weight=ft.FontWeight.BOLD,
                                 text_align=ft.TextAlign.CENTER,

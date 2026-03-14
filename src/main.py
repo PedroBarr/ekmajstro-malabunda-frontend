@@ -1,9 +1,13 @@
 import flet as ft
 
+from src.api_client import APIClient
+
 from src.views.bienvenida import Bienvenida
 
+api = APIClient()
+
 def index(pagina: ft.Page):
-    pagina.title = "Malabunda"
+    pagina.title = api.obtener_nombre() or "Cargando..."
     pagina.theme_mode = ft.ThemeMode.DARK
     
     def enrutador(e):

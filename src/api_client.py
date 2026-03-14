@@ -2,7 +2,7 @@ import httpx
 
 class APIClient:
     def __init__(self):
-        self.base_url = "https://ekcion-malabunda-api.up.railway.app/"
+        self.base_url = "https://ekcion-malabunda-api.up.railway.app"
         self.timeout = 10.0
 
     def obtener_nombre(self):
@@ -13,6 +13,19 @@ class APIClient:
             )
             respuesta.raise_for_status()
             return respuesta.text
+        except httpx.HTTPStatusError as exc:
+            print(f"Error en la solicitud: {exc.response.status_code} - {exc.response.text}")
+        except Exception as exc:
+            print(f"Error inesperado: {exc}")
+
+    def obtener_personas(self):
+        try:
+            respuesta = httpx.get(
+                f'{self.base_url}/personas',
+                timeout=self.timeout
+            )
+            respuesta.raise_for_status()
+            return respuesta.json()
         except httpx.HTTPStatusError as exc:
             print(f"Error en la solicitud: {exc.response.status_code} - {exc.response.text}")
         except Exception as exc:

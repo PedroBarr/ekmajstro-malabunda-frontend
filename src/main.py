@@ -1,9 +1,9 @@
 import flet as ft
 
-from src.api_client import APIClient
+from api_client import APIClient
 
-from src.views.bienvenida import Bienvenida
-from src.views.lista import Lista
+from views.bienvenida import Bienvenida
+from views.lista import Lista
 
 api = APIClient()
 

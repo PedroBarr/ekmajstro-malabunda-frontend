@@ -1,5 +1,5 @@
 import flet as ft
-from src.api_client import APIClient
+from api_client import APIClient
 
 def Lista(pagina: ft.Page, api: APIClient):
     vista_lista = ft.ListView(expand=True, spacing=10, padding=10)

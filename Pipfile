@@ -11,3 +11,8 @@ httpx = "*"
 
 [requires]
 python_version = "3.13"
+
+[scripts]
+dev = "python src/main.py"
+build = "flet publish src/main.py --base-url /ekmajstro-malabunda-frontend/"
+deploy = "ghp-import -p src/dist"

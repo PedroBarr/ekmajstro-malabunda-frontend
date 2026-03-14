@@ -3,6 +3,7 @@ import flet as ft
 from src.api_client import APIClient
 
 from src.views.bienvenida import Bienvenida
+from src.views.lista import Lista
 
 api = APIClient()
 
@@ -14,6 +15,7 @@ def index(pagina: ft.Page):
         pagina.views.clear()
 
         if pagina.route == "/": pagina.views.append(Bienvenida(pagina))
+        elif pagina.route == "/lista": pagina.views.append(Lista(pagina, api))
 
         pagina.update()
 

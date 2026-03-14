@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 flet = "*"
+httpx = "*"
 
 [dev-packages]
 

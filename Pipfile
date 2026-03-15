@@ -17,3 +17,4 @@ dev = "python src/main.py"
 build = {call = "scripts.build:build()"}
 publish = "git push origin main"
 deploy = "ghp-import -p src/dist"
+serve = "flet run -r --web src/main.py"

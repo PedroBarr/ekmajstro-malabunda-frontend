@@ -38,6 +38,6 @@ async def index(pagina: ft.Page):
     asyncio.create_task(cargar_nombre())
     await enrutador(None)
 
-def main(): ft.app(target=index)
+def main(): ft.run(index)
 
 if __name__ == "__main__": main()

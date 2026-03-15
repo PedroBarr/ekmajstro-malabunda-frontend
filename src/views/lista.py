@@ -31,6 +31,9 @@ async def Lista(pagina: ft.Page, api: APIClient):
         ],
     )
 
+    async def ir_a_detalle(e, persona_id):
+        await pagina.push_route(f"/persona/{persona_id}")
+
     async def obtener_personas():
         vista_lista.controls.clear()
         personas = await api.obtener_personas()
@@ -41,7 +44,7 @@ async def Lista(pagina: ft.Page, api: APIClient):
                     leading=ft.CircleAvatar(),
                     title=ft.Text(f'{persona["apellido"]}, {persona["nombre"]}'),
                     subtitle=ft.Text(f"ID: {persona['_id']}"),
-                    on_click=lambda _, p=persona['_id']: pagina.go(f"/persona/{p}"),
+                    on_click=lambda _, p=persona['_id']: asyncio.create_task(ir_a_detalle(_, p))
                 )
             )
 

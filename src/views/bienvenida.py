@@ -11,6 +11,8 @@ async def Bienvenida(pagina: ft.Page):
         elemento_bienvenida.weight = ft.FontWeight.BOLD
         elemento_bienvenida.text_align = ft.TextAlign.CENTER
 
+    async def ir_a_lista(e): await pagina.push_route("/lista")
+    
     inicializar_elementos()
 
     return ft.View(
@@ -25,10 +27,10 @@ async def Bienvenida(pagina: ft.Page):
                                 "Explora una de las siguientes opciones",
                                 size=16,
                             ),
-                            ft.ElevatedButton(
+                            ft.Button(
                                 "Ver Lista de Personas",
                                 icon=ft.Icons.LIST,
-                                on_click=lambda _: pagina.go("/lista"),
+                                on_click=ir_a_lista,
                                 height=50,
                             ),
                         ],

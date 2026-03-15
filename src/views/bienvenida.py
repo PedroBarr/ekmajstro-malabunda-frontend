@@ -11,6 +11,9 @@ async def Bienvenida(pagina: ft.Page):
         elemento_bienvenida.weight = ft.FontWeight.BOLD
         elemento_bienvenida.text_align = ft.TextAlign.CENTER
 
+        if pagina.title != elemento_bienvenida.value:
+            elemento_bienvenida.value = f"Bienvenido al Sistema {pagina.title}"
+
     async def ir_a_lista(e): await pagina.push_route("/lista")
     
     inicializar_elementos()

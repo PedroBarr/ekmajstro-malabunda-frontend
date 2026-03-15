@@ -5,6 +5,31 @@ from api_client import APIClient
 
 async def Lista(pagina: ft.Page, api: APIClient):
     vista_lista = ft.ListView(expand=True, spacing=10, padding=10)
+    vista = ft.View(
+        route="/lista",
+        controls=[
+            ft.Row(
+                [
+                    ft.Column(
+                        [
+                            ft.ProgressRing(),
+                            ft.Text(
+                                "Lista de Personas",
+                                size=30,
+                                weight=ft.FontWeight.BOLD,
+                                text_align=ft.TextAlign.CENTER,
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                expand=True,
+            ),
+        ],
+    )
 
     async def obtener_personas():
         vista_lista.controls.clear()
@@ -20,11 +45,9 @@ async def Lista(pagina: ft.Page, api: APIClient):
                 )
             )
 
+        vista.controls = [vista_lista]
         pagina.update()
 
-    await obtener_personas()
+    asyncio.create_task(obtener_personas())
 
-    return ft.View(
-        route="/lista",
-        controls=[vista_lista],
-    )
+    return vista

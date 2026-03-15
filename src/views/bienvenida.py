@@ -1,6 +1,18 @@
 import flet as ft
 
-def Bienvenida(pagina: ft.Page):
+elemento_bienvenida = ft.Text()
+
+async def Bienvenida(pagina: ft.Page):
+
+    def inicializar_elementos():
+        elemento_bienvenida.value = f"Cargando..."
+        elemento_bienvenida.font_family = "Arial"
+        elemento_bienvenida.size = 30
+        elemento_bienvenida.weight = ft.FontWeight.BOLD
+        elemento_bienvenida.text_align = ft.TextAlign.CENTER
+
+    inicializar_elementos()
+
     return ft.View(
         route="/",
         controls=[
@@ -8,12 +20,7 @@ def Bienvenida(pagina: ft.Page):
                 [
                     ft.Column(
                         [
-                            ft.Text(
-                                "Bienvenido al Sistema " + pagina.title,
-                                size=30,
-                                weight=ft.FontWeight.BOLD,
-                                text_align=ft.TextAlign.CENTER,
-                            ),
+                            elemento_bienvenida,
                             ft.Text(
                                 "Explora una de las siguientes opciones",
                                 size=16,

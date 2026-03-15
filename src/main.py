@@ -16,7 +16,7 @@ async def index(pagina: ft.Page):
         pagina.views.clear()
 
         if pagina.route == "/": pagina.views.append(await Bienvenida(pagina))
-        elif pagina.route == "/lista": pagina.views.append(Lista(pagina, api))
+        elif pagina.route == "/lista": pagina.views.append(await Lista(pagina, api))
 
         pagina.update()
 

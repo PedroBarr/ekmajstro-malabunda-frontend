@@ -1,12 +1,14 @@
 import flet as ft
+import asyncio
+
 from api_client import APIClient
 
-def Lista(pagina: ft.Page, api: APIClient):
+async def Lista(pagina: ft.Page, api: APIClient):
     vista_lista = ft.ListView(expand=True, spacing=10, padding=10)
 
-    def obtener_personas():
+    async def obtener_personas():
         vista_lista.controls.clear()
-        personas = api.obtener_personas()
+        personas = await api.obtener_personas()
 
         for persona in personas:
             vista_lista.controls.append(
@@ -20,7 +22,7 @@ def Lista(pagina: ft.Page, api: APIClient):
 
         pagina.update()
 
-    obtener_personas()
+    await obtener_personas()
 
     return ft.View(
         route="/lista",

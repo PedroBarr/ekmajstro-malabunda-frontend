@@ -6,17 +6,22 @@ from api_client import APIClient
 from views.bienvenida import Bienvenida, elemento_bienvenida
 from views.lista import Lista
 
+from components.BFA_principal import BotonFlotanteAccionPrincipal
+
 api = APIClient()
 
 async def index(pagina: ft.Page):
     pagina.title = "Cargando..."
     pagina.theme_mode = ft.ThemeMode.DARK
+    BAF = BotonFlotanteAccionPrincipal(pagina)
     
     async def enrutador(e):
         pagina.views.clear()
 
         if pagina.route == "/": pagina.views.append(await Bienvenida(pagina))
         elif pagina.route == "/lista": pagina.views.append(await Lista(pagina, api))
+
+        BAF.agregar_a_pagina(pagina)
 
         pagina.update()
 

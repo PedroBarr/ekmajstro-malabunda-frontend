@@ -1,4 +1,5 @@
 import flet as ft
+import asyncio
 
 from api_client import APIClient
 
@@ -7,8 +8,8 @@ from views.lista import Lista
 
 api = APIClient()
 
-def index(pagina: ft.Page):
-    pagina.title = api.obtener_nombre() or "Cargando..."
+async def index(pagina: ft.Page):
+    pagina.title = await api.obtener_nombre() or "Cargando..."
     pagina.theme_mode = ft.ThemeMode.DARK
     
     def enrutador(e):

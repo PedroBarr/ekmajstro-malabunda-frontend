@@ -1,1 +1,9 @@
+annotated-types
+anyio
+certifi
+flet
+h11
+httpcore
+httpx
+idna
 pydantic

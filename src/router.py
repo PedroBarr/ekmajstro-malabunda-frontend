@@ -1,4 +1,5 @@
 import flet as ft
+import asyncio
 
 from consts import etiquetas
 
@@ -18,7 +19,10 @@ class Enrutador:
         if self.pagina.route == ruta_bienvenida:
             self.pagina.views.append(await Bienvenida(self.pagina))
         elif self.pagina.route == ruta_lista:
-            self.pagina.views.append(await Lista(self.pagina))
+            lista = Lista(self.pagina)
+            self.pagina.views.append(lista.vista)
+            self.pagina.update()
+            asyncio.create_task(lista.obtener_personas())
 
         BotonFlotanteAccionPrincipal.instancia().agregar_a_pagina()
 

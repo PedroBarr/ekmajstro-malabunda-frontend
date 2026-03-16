@@ -7,6 +7,8 @@ etiquetas = {
     "DETAIL": "Detalle",
 
     # Vistas
+    "ID_LABEL": lambda id: f"ID: {id}",
+
     "WELCOME_MESSAGE": lambda nombre: f"Bienvenido al Sistema {nombre}",
     "WELCOME_DESCRIPTION": "Explora una de las siguientes opciones",
     "GOTO": lambda destino: f"Ir a {destino}",

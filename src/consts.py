@@ -30,5 +30,5 @@ etiquetas = {
     "EXCEPTION_UNEXPECTED": lambda exc: f"Error inesperado: {exc}",
 }
 
-api_url = os.getenv("API_URL")
+api_url = os.getenv("API_URL", "${{ secrets.API_URL }}")
 api_tiempo_espera = 10.0

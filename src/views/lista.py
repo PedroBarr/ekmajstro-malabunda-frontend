@@ -5,6 +5,9 @@ from consts import etiquetas
 from utils import rutas
 from api_client import ClienteAPI
 
+from models.persona import Persona
+from components.fila_lista import fila_lista
+
 ruta = rutas[etiquetas["LIST"]]
 
 class Lista:
@@ -18,16 +21,13 @@ class Lista:
 
     async def obtener_personas(self):
         self.vista_lista.controls.clear()
-        personas = await ClienteAPI().obtener_personas()
+        personas: list[Persona] = await ClienteAPI().obtener_personas()
         
         for persona in personas:
             self.vista_lista.controls.append(
-                ft.ListTile(
-                    leading=ft.CircleAvatar(),
-                    title=ft.Text(f'{persona["apellido"]}, {persona["nombre"]}'),
-                    subtitle=ft.Text(f"ID: {persona['_id']}"),
-                    on_click=lambda _, p = \
-                        persona['_id']: asyncio.create_task(self.ir_a_detalle(p))
+                fila_lista(
+                    persona,
+                    lambda p: asyncio.create_task(self.ir_a_detalle(p.id))
                 )
             )
 

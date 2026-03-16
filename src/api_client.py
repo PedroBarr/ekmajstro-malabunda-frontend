@@ -2,6 +2,8 @@ import httpx
 
 from consts import api_url, api_tiempo_espera, etiquetas
 
+from models.persona import Persona
+
 enlaces = {
     'nombre': lambda api: f'{api}',
     'personas': lambda api: f'{api}/personas',
@@ -44,4 +46,4 @@ class ClienteAPI:
     async def obtener_personas(self, cliente: httpx.AsyncClient):
         respuesta = await cliente.get(self.enlace('personas'))
         respuesta.raise_for_status()
-        return respuesta.json()
+        return [Persona(**persona) for persona in respuesta.json()]

@@ -1,0 +1,43 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: |
+          pip install pipenv
+          pipenv install --system --deploy
+          pip install flet
+
+      - name: Build Static Web
+        env:
+          API_URL: ${{ secrets.API_URL }} 
+        run: |
+          flet publish src/main.py --base-url /ekmajstro-malabunda-frontend/
+      
+      - name: Copy index.html to 404.html
+        run: cp src/dist/index.html src/dist/404.html
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: src/dist
+          branch: gh-pages

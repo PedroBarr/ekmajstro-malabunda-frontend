@@ -7,6 +7,7 @@ name = "pypi"
 flet = "*"
 httpx = "*"
 pydantic = "*"
+python-dateutil = "*"
 
 [dev-packages]
 
@@ -16,6 +17,6 @@ python_version = "3.13"
 [scripts]
 dev = "python src/main.py"
 build = {call = "scripts.build:build()"}
-publish = "git push origin main"
-deploy = "ghp-import -p src/dist"
+publish = "git commit -m"
+deploy = "git push origin main"
 serve = "flet run -r --web src/main.py"

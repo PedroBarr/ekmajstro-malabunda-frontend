@@ -1,3 +1,5 @@
+import os
+
 etiquetas = {
     "LOADING": "Cargando...",
 
@@ -28,5 +30,5 @@ etiquetas = {
     "EXCEPTION_UNEXPECTED": lambda exc: f"Error inesperado: {exc}",
 }
 
-api_url = "https://ekcion-malabunda-api.up.railway.app"
+api_url = os.getenv("API_URL")
 api_tiempo_espera = 10.0

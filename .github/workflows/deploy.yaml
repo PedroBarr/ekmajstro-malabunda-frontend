@@ -27,8 +27,6 @@ jobs:
           pip install flet
 
       - name: Build Static Web
-        env:
-          API_URL: ${{ secrets.API_URL }}
         run: |
           flet publish src/main.py --base-url /ekmajstro-malabunda-frontend/
       

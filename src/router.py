@@ -1,7 +1,7 @@
 import flet as ft
 import asyncio
 
-from consts import etiquetas, api_url
+from consts import etiquetas
 
 from components.BFA_principal import BotonFlotanteAccionPrincipal
 from views.bienvenida import ruta as ruta_bienvenida, Bienvenida
@@ -25,7 +25,6 @@ class Enrutador:
             asyncio.create_task(lista.obtener_personas())
 
         BotonFlotanteAccionPrincipal.instancia().agregar_a_pagina()
-        self.pagina.title = api_url
 
         self.pagina.update()
 

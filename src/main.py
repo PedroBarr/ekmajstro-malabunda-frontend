@@ -1,47 +1,38 @@
 import flet as ft
 import asyncio
 
-from api_client import APIClient
-
-from views.bienvenida import Bienvenida, elemento_bienvenida
-from views.lista import Lista
+from consts import etiquetas
+from api_client import ClienteAPI
+from router import Enrutador
 
 from components.BFA_principal import BotonFlotanteAccionPrincipal
+from views.bienvenida import elemento_bienvenida
 
-api = APIClient()
-
-async def index(pagina: ft.Page):
-    pagina.title = "Cargando..."
+def configurar(pagina: ft.Page):
+    pagina.title = etiquetas["LOADING"]
     pagina.theme_mode = ft.ThemeMode.DARK
-    BAF = BotonFlotanteAccionPrincipal(pagina)
+
+    BotonFlotanteAccionPrincipal.instancia(pagina)
+    enrutador = Enrutador.instancia(pagina)
+
+    pagina.on_route_change = enrutador.enrutador
+    pagina.on_view_pop = enrutador.pinchar_vista
+
+    asyncio.create_task(cargar_configuracion(pagina))
+
+async def cargar_configuracion(pagina: ft.Page):
+    config = await ClienteAPI().obtener_config()
     
-    async def enrutador(e):
-        pagina.views.clear()
-
-        if pagina.route == "/": pagina.views.append(await Bienvenida(pagina))
-        elif pagina.route == "/lista": pagina.views.append(await Lista(pagina, api))
-
-        BAF.agregar_a_pagina(pagina)
-
+    if config['nombre']:
+        pagina.title = config['nombre']
+        elemento_bienvenida.value = \
+            etiquetas["WELCOME_MESSAGE"](config['nombre'])
+        
         pagina.update()
 
-    def pinchar_vista(e):
-        if len(pagina.views) > 1:
-            pagina.views.pop()
-            pagina.go(pagina.views[-1].route)
-
-    pagina.on_route_change = enrutador
-    pagina.on_view_pop = pinchar_vista
-
-    async def cargar_nombre():
-        nombre = await api.obtener_nombre()
-        if nombre:
-            pagina.title = nombre
-            elemento_bienvenida.value = f"Bienvenido al Sistema {nombre}"
-            pagina.update()
-    
-    asyncio.create_task(cargar_nombre())
-    await enrutador(None)
+async def index(pagina: ft.Page):
+    configurar(pagina)
+    await Enrutador.instancia().enrutador(None)
 
 def main(): ft.run(index)
 

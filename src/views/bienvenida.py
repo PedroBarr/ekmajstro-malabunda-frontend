@@ -1,25 +1,33 @@
 import flet as ft
+import asyncio
+
+from consts import etiquetas
+from utils import rutas
+
+ruta = rutas[etiquetas["HOME"]]
 
 elemento_bienvenida = ft.Text()
 
 async def Bienvenida(pagina: ft.Page):
 
     def inicializar_elementos():
-        elemento_bienvenida.value = f"Cargando..."
+        elemento_bienvenida.value = etiquetas["LOADING"]
         elemento_bienvenida.font_family = "Arial"
         elemento_bienvenida.size = 30
         elemento_bienvenida.weight = ft.FontWeight.BOLD
         elemento_bienvenida.text_align = ft.TextAlign.CENTER
 
         if pagina.title != elemento_bienvenida.value:
-            elemento_bienvenida.value = f"Bienvenido al Sistema {pagina.title}"
+            elemento_bienvenida.value = \
+                etiquetas["WELCOME_MESSAGE"](pagina.title)
 
-    async def ir_a_lista(e): await pagina.push_route("/lista")
+    async def ir_a_lista(e):
+        await pagina.push_route(rutas[etiquetas["LIST"]])
     
     inicializar_elementos()
 
     return ft.View(
-        route="/",
+        route=ruta,
         controls=[
             ft.Row(
                 [
@@ -27,11 +35,11 @@ async def Bienvenida(pagina: ft.Page):
                         [
                             elemento_bienvenida,
                             ft.Text(
-                                "Explora una de las siguientes opciones",
+                                etiquetas["WELCOME_DESCRIPTION"],
                                 size=16,
                             ),
                             ft.Button(
-                                "Ver Lista de Personas",
+                                etiquetas["GOTO"](etiquetas["LIST_TITLE"]),
                                 icon=ft.Icons.LIST,
                                 on_click=ir_a_lista,
                                 height=50,

@@ -1,12 +1,17 @@
 import flet as ft
 import asyncio
 
-from api_client import APIClient
+from consts import etiquetas
+from utils import rutas
+from api_client import ClienteAPI
 
-async def Lista(pagina: ft.Page, api: APIClient):
+ruta = rutas[etiquetas["LIST"]]
+
+async def Lista(pagina: ft.Page):
     vista_lista = ft.ListView(expand=True, spacing=10, padding=10)
+    
     vista = ft.View(
-        route="/lista",
+        route=ruta,
         controls=[
             ft.Row(
                 [
@@ -14,7 +19,7 @@ async def Lista(pagina: ft.Page, api: APIClient):
                         [
                             ft.ProgressRing(),
                             ft.Text(
-                                "Lista de Personas",
+                                etiquetas["LIST_TITLE"],
                                 size=30,
                                 weight=ft.FontWeight.BOLD,
                                 text_align=ft.TextAlign.CENTER,
@@ -32,11 +37,11 @@ async def Lista(pagina: ft.Page, api: APIClient):
     )
 
     async def ir_a_detalle(e, persona_id):
-        await pagina.push_route(f"/persona/{persona_id}")
+        await pagina.push_route(rutas[etiquetas["DETAIL"]](persona_id))
 
     async def obtener_personas():
         vista_lista.controls.clear()
-        personas = await api.obtener_personas()
+        personas = await ClienteAPI().obtener_personas()
 
         for persona in personas:
             vista_lista.controls.append(

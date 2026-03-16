@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Static Web
         env:
-          API_URL: ${{ secrets.API_URL }} 
+          API_URL: https://ekcion-malabunda-api.up.railway.app
         run: |
           flet publish src/main.py --base-url /ekmajstro-malabunda-frontend/
       

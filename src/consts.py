@@ -1,5 +1,19 @@
+#-------------------------------------------------------------------------------
+# Nombre:      Constantes de la aplicación
+# Proposito:   Contiene las constantes utilizadas en la aplicación
+#
+# Autor:       Aref
+#
+# Creado:      19-3/3/1999+19+9-1
+# Derechos
+# de autor:    (k) Alta Lengua 2026
+# Licencia:    <GPLv3>
+#-------------------------------------------------------------------------------
+
 import os
 
+# Diccionario de etiquetas para la interfaz de usuario, mensajes de error,
+#  notas de navegación, mensajes de aserción y excepciones.
 etiquetas = {
     "LOADING": "Cargando...",
 
@@ -17,7 +31,7 @@ etiquetas = {
 
     "LIST_TITLE": "Lista de Personas",
 
-    # Tooltips
+    # Navegación
     "TOOLTIP_HOME": "Volver al Inicio",
 
     # Aserciones
@@ -30,5 +44,6 @@ etiquetas = {
     "EXCEPTION_UNEXPECTED": lambda exc: f"Error inesperado: {exc}",
 }
 
+# constantes de configuración de la API
 api_url = os.getenv("API_URL", "https://ekcion-malabunda-api.up.railway.app")
 api_tiempo_espera = 10.0

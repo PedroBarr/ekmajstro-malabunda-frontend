@@ -1,23 +1,50 @@
+#-------------------------------------------------------------------------------
+# Nombre:      Cliente API de la aplicación
+# Proposito:   Contiene el cliente API para interactuar con el
+#              dorsal
+#
+# Autor:       Aref
+#
+# Creado:      19-3/3/1999+19+9-1
+# Derechos
+# de autor:    (k) Alta Lengua 2026
+# Licencia:    <GPLv3>
+#-------------------------------------------------------------------------------
+
 import httpx
 
 from consts import api_url, api_tiempo_espera, etiquetas
 
 from models.persona import Persona
 
+# Enlaces de la API para diferentes recursos
 enlaces = {
     'nombre': lambda api: f'{api}',
     'personas': lambda api: f'{api}/personas',
 }
 
 class ClienteAPI:
+    """ Clase: Cliente API
+
+    Cliente para interactuar con la API del dorsal.
+
+    Define metodos asíncronos y decoradores para la gestión
+    de las peticiones a la API, el manejo de errores y la
+    obtención de datos para su uso en la aplicación.
+    """
+
+    # Método dunder de inicialización
     def __init__(self):
         self.url_base = api_url
         self.tiempo_espera = api_tiempo_espera
 
-    def enlace(self, clave):
-        return enlaces[clave](self.url_base)
+    # Función privada: Obtener el enlace para el endpoint de la API
+    def _enlace(self, clave: str): return enlaces[clave](self.url_base)
 
-    def envolver_peticion(funcion):
+    # Decorador: Envolver las funciones de petición a la API para
+    #  manejar errores y gestionar el cliente HTTP
+    def envolver_peticion(funcion: callable):
+        # Envoltura asíncrona para manejar la petición a la API
         async def envoltorio(self, *args, **kwargs):
             async with httpx.AsyncClient(timeout=self.tiempo_espera) as cliente:
                 try: return await funcion(self, cliente, *args, **kwargs)
@@ -32,9 +59,12 @@ class ClienteAPI:
                     print(etiquetas["EXCEPTION_UNEXPECTED"](exc))
         return envoltorio
 
+    # Función asíncrona envuelta: Obtener la configuración
+    #  inicializada en la API
     @envolver_peticion
     async def obtener_config(self, cliente: httpx.AsyncClient):
-        respuesta = await cliente.get(self.enlace('nombre'))
+        # Nombre
+        respuesta = await cliente.get(self._enlace('nombre'))
         respuesta.raise_for_status()
         nombre = respuesta.text.strip() if respuesta.text.strip() else None
         
@@ -42,8 +72,10 @@ class ClienteAPI:
             'nombre': nombre
         }
 
+    # Función asíncrona envuelta: Obtener la lista de personas
+    #  desde la API y devolverla como una lista de objetos Persona
     @envolver_peticion
     async def obtener_personas(self, cliente: httpx.AsyncClient):
-        respuesta = await cliente.get(self.enlace('personas'))
+        respuesta = await cliente.get(self._enlace('personas'))
         respuesta.raise_for_status()
         return [Persona(**persona) for persona in respuesta.json()]

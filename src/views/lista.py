@@ -1,3 +1,15 @@
+#-------------------------------------------------------------------------------
+# Nombre:      Vista de lista de personas
+# Proposito:   Contiene la clase lista de personas
+#
+# Autor:       Aref
+#
+# Creado:      19-3/3/1999+19+9-1
+# Derechos
+# de autor:    (k) Alta Lengua 2026
+# Licencia:    <GPLv3>
+#-------------------------------------------------------------------------------
+
 import flet as ft
 import asyncio
 
@@ -11,14 +23,28 @@ from components.fila_lista import fila_lista
 ruta = rutas[etiquetas["LIST"]]
 
 class Lista:
+    """ Clase: Lista
+
+    Vista de lista de personas.
+
+    Define metodos asíncronos y variables internas para la
+    gestión de la vista, la navegación y la interacción con la
+    API para obtener los datos de las personas y mostrarlos en
+    la interfaz.
+    """
+
+    # Método dunder de inicialización
     def __init__(self, pagina: ft.Page):
         self.pagina = pagina
         self.vista_lista = ft.ListView(expand=True, spacing=10, padding=10)
         self.vista = self.vista(pagina)
-        
+    
+    # Función asíncrona: Ir a la vista de detalle de una persona
     async def ir_a_detalle(self, persona_id):
         await self.pagina.push_route(rutas[etiquetas["DETAIL"]](persona_id))
 
+    # Función asíncrona: Obtener la lista de personas
+    #  y actualizar la vista con los datos obtenidos
     async def obtener_personas(self):
         self.vista_lista.controls.clear()
         personas: list[Persona] = await ClienteAPI().obtener_personas()
@@ -34,6 +60,7 @@ class Lista:
         self.vista.controls = [self.vista_lista]
         self.pagina.update()
 
+    # Función: Crear la vista de lista con su configuración inicial
     def vista(self, pagina: ft.Page):
         vista = ft.View(
             route=ruta,

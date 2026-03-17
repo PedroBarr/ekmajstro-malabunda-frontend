@@ -15,7 +15,7 @@ python_version = "3.13"
 
 [scripts]
 dev = "python src/main.py"
-build = {call = "scripts.build:build()"}
+build = {call = "scripts.build:construir()"}
 publish = "git commit -m"
 deploy = "git push origin main"
 serve = "flet run -r --web src/main.py"

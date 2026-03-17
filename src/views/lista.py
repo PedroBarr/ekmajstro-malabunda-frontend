@@ -47,7 +47,12 @@ class Lista:
     #  y actualizar la vista con los datos obtenidos
     async def obtener_personas(self):
         self.vista_lista.controls.clear()
-        personas: list[Persona] = await ClienteAPI().obtener_personas()
+        try: personas: list[Persona] = await ClienteAPI().obtener_personas()
+        except Exception as e:
+            self.vista_lista.controls.append(
+                ft.Text(etiquetas["ERROR_LOADING_LIST"])
+            )
+            personas = []
         
         for persona in personas:
             self.vista_lista.controls.append(

@@ -38,7 +38,11 @@ def configurar(pagina: ft.Page):
 
 # Función asíncrona: Cargar la configuración de la aplicación
 async def cargar_configuracion(pagina: ft.Page):
-    config = await ClienteAPI().obtener_config()
+    try: config = await ClienteAPI().obtener_config()
+    except Exception as e:
+        elemento_bienvenida.value = etiquetas["ERROR_LOADING_CONFIG"]
+        pagina.update()
+        return
     
     if config['nombre']:
         pagina.title = config['nombre']

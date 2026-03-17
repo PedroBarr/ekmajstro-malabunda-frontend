@@ -24,12 +24,14 @@ etiquetas = {
 
     # Vistas
     "ID_LABEL": lambda id: f"ID: {id}",
+    "ERROR_LOADING_CONFIG": "Error. API no disponible.",
 
     "WELCOME_MESSAGE": lambda nombre: f"Bienvenido al Sistema {nombre}",
     "WELCOME_DESCRIPTION": "Explora una de las siguientes opciones",
     "GOTO": lambda destino: f"Ir a {destino}",
 
     "LIST_TITLE": "Lista de Personas",
+    "ERROR_LOADING_LIST": "Error al cargar la lista.",
 
     # Navegación
     "TOOLTIP_HOME": "Volver al Inicio",

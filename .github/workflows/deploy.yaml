@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Despliegue a GitHub Pages
 
 on:
   push:
@@ -8,32 +8,32 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Encapsular el código
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
-      - name: Install Flutter
+      - name: Instalar Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: |
           pip install -r requirements.txt
           pip install flet
 
-      - name: Build Static Web
+      - name: Construir la distribución
         run: |
           flet publish src/main.py --base-url /ekmajstro-malabunda-frontend/
       
-      - name: Copy index.html to 404.html
+      - name: Agregar archivo 404.html
         run: cp src/dist/index.html src/dist/404.html
 
-      - name: Deploy to GitHub Pages
+      - name: Desplegar a GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: src/dist

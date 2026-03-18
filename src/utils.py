@@ -12,6 +12,7 @@
 #-------------------------------------------------------------------------------
 
 import flet as ft
+import re
 
 from consts import etiquetas
 
@@ -26,3 +27,8 @@ rutas = {
 async def ir_a_inicio(pagina: ft.Page):
     if pagina.route != rutas[etiquetas["HOME"]]:
         await pagina.push_route(rutas[etiquetas["HOME"]])
+
+def es_ruta(ruta_objetivo: str, ruta_actual: str) -> bool:
+    ruta_regex = re.sub(r":\w+", r"[^/]+", ruta_objetivo)
+    ruta_regex = f"^{ruta_regex}$"
+    return re.match(ruta_regex, ruta_actual) is not None

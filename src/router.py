@@ -18,6 +18,7 @@ from consts import etiquetas
 from utils import es_ruta
 
 from components.BFA_principal import BotonFlotanteAccionPrincipal
+
 from views.bienvenida import ruta as ruta_bienvenida, Bienvenida
 from views.lista import ruta as ruta_lista, Lista
 from views.persona import ruta as ruta_persona, PersonaVista
@@ -46,7 +47,9 @@ class Enrutador:
             self.pagina.update()
             asyncio.create_task(lista.obtener_personas())
         elif es_ruta(ruta_persona, self.pagina.route):
-            self.pagina.views.append(PersonaVista(self.pagina))
+            persona = PersonaVista(self.pagina)
+            self.pagina.views.append(persona.vista)
+            asyncio.create_task(persona.cargar_datos())
 
         # Agregar botón flotante de acción principal
         BotonFlotanteAccionPrincipal.instancia().agregar_a_pagina()

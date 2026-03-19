@@ -23,7 +23,7 @@ class Persona(BaseModel):
     Modelo de datos para representar a una persona para su
     serialización y deserialización en la aplicación.
     """
-    id: Optional[str] = None
+    id: Optional[str] = Field(..., alias="_id")
     nombre: Optional[str] = ""
     apellido: str
     metadatos: Optional[Dict[str, Any]] = \

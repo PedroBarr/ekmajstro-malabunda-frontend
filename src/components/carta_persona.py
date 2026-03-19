@@ -27,6 +27,10 @@ class CartaPersona(ft.Card):
             bgcolor=ft.Colors.BLUE_GREY_700,
         )
     
+    def _modificar_persona(self, cambios: dict):
+        self.persona.modificar(cambios)
+        self.al_cambio(self.persona)
+    
     def _info_cabecera(self):
         return ft.Container(
             expand=True,
@@ -39,7 +43,7 @@ class CartaPersona(ft.Card):
                             CampoEditable(
                                 "Apellido",
                                 self.persona.apellido,
-                                lambda valor: self.persona.modificar({
+                                lambda valor: self._modificar_persona({
                                     "apellido": valor
                                 }),
                                 editable=self._es_editable,
@@ -49,7 +53,7 @@ class CartaPersona(ft.Card):
                             CampoEditable(
                                 "Nombre",
                                 self.persona.nombre,
-                                lambda valor: self.persona.modificar({
+                                lambda valor: self._modificar_persona({
                                     "nombre": valor
                                 }),
                                 editable=self._es_editable,

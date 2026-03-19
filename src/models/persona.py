@@ -60,6 +60,26 @@ class Persona(BaseModel):
         for clave, valor in dicc.items():
             if hasattr(self, clave): setattr(self, clave, valor)
 
+    def cambios(self, persona: "Persona") -> Dict[str, Any]:
+        cambios = {}
+        for campo in self.__class__.model_fields:
+            valor_actual = getattr(self, campo)
+            valor_nuevo = getattr(persona, campo)
+            if campo == "metadatos": continue
+            if valor_actual != valor_nuevo: cambios[campo] = valor_nuevo
+        
+        claves_metadatos = (
+            set(self.metadatos.keys()) |
+            set(persona.metadatos.keys())
+        )
+        
+        for clave in claves_metadatos:
+            valor_actual = self.metadatos.get(clave) or None
+            valor_nuevo = persona.metadatos.get(clave) or None
+            if valor_actual != valor_nuevo: cambios[f"metadata.{clave}"] = valor_nuevo
+
+        return cambios
+
     @classmethod
     def sintetizar(
         cls,
@@ -69,12 +89,40 @@ class Persona(BaseModel):
         metadatos: Optional[Dict[str, Any]] = None,
         modificado: Optional[datetime] = None,
         dicc: Optional[Dict[str, Any]] = None,
+        persona: Optional["Persona"] = None,
     ):
-        _id = id or (dicc.get("id") if dicc else None)
-        _nombre = nombre or (dicc.get("nombre") if dicc else "")
-        _apellido = apellido or (dicc.get("apellido") if dicc else "")
-        _metadatos = metadatos or (dicc.get("metadata") if dicc else None) or {}
-        _modificado = modificado or (dicc.get("updatedAt") if dicc else None) or datetime.now()
+        _id = (
+            id or
+            (dicc.get("id") if dicc else None) or
+            (persona.id if persona else None)
+        )
+
+        _nombre = (
+            nombre or
+            (dicc.get("nombre") if dicc else "") or
+            (persona.nombre if persona else "")
+        )
+
+        _apellido = (
+            apellido or
+            (dicc.get("apellido") if dicc else "") or
+            (persona.apellido if persona else "")
+        )
+
+        _metadatos = (
+            metadatos or
+            (dicc.get("metadata") if dicc else None) or
+            (persona.metadatos if persona else {}) or
+            {}
+        )
+
+        _modificado = (
+            modificado or
+            (dicc.get("updatedAt") if dicc else None) or
+            (persona.modificado if persona else datetime.now()) or
+            datetime.now()
+        )
+
         return cls(
             id=_id,
             nombre=_nombre,

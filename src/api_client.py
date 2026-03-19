@@ -21,6 +21,7 @@ from models.persona import Persona
 enlaces = {
     'nombre': lambda api: f'{api}',
     'personas': lambda api: f'{api}/personas',
+    'persona': lambda api: f'{api}/personas/{{id}}',
 }
 
 class ClienteAPI:
@@ -79,3 +80,18 @@ class ClienteAPI:
         respuesta = await cliente.get(self._enlace('personas'))
         respuesta.raise_for_status()
         return [Persona(**persona) for persona in respuesta.json()]
+    
+    @envolver_peticion
+    async def obtener_persona(self, cliente: httpx.AsyncClient, id: str):
+        respuesta = await cliente.get(f"{self._enlace('persona')}".format(id=id))
+        respuesta.raise_for_status()
+        return Persona(**respuesta.json())
+    
+    @envolver_peticion
+    async def parchar_persona(self, cliente: httpx.AsyncClient, id: str, cambios: dict):
+        respuesta = await cliente.patch(
+            f"{self._enlace('persona')}".format(id=id),
+            json=cambios
+        )
+        respuesta.raise_for_status()
+        return Persona(**respuesta.json())

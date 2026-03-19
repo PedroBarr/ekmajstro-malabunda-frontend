@@ -37,7 +37,7 @@ class Lista:
     def __init__(self, pagina: ft.Page):
         self.pagina = pagina
         self.vista_lista = ft.ListView(expand=True, spacing=10, padding=10)
-        self.vista = self.vista(pagina)
+        self.vista = self.construir()
     
     # Función asíncrona: Ir a la vista de detalle de una persona
     async def ir_a_detalle(self, persona_id):
@@ -65,9 +65,8 @@ class Lista:
         self.vista.controls = [self.vista_lista]
         self.pagina.update()
 
-    # Función: Crear la vista de lista con su configuración inicial
-    def vista(self, pagina: ft.Page):
-        vista = ft.View(
+    def construir(self):
+        return ft.View(
             route=ruta,
             controls=[ft.Row(
                 [ft.Column(
@@ -87,6 +86,4 @@ class Lista:
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
                 expand=True,
             )],
-        )        
-
-        return vista
+        )

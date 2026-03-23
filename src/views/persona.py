@@ -9,6 +9,7 @@ from api_client import ClienteAPI
 from models.persona import Persona
 
 from components.carta_persona import CartaPersona
+from components.caja_mensaje import caja_cargando, caja_error
 
 ruta = rutas[etiquetas["DETAIL"]](":id")
 ruta_creacion = rutas[etiquetas["DETAIL"]](None)
@@ -85,22 +86,9 @@ class PersonaVista:
         )
     
     def _carta_fallida(self):
-        return ft.Container(
-            expand=True,
-            content=ft.Column(
-                alignment=ft.MainAxisAlignment.CENTER,
-                controls=[
-                    ft.Row(
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        controls=[
-                            ft.Text(
-                                etiquetas["ERROR_LOADING_DETAIL"],
-                                size=20
-                            )
-                        ]
-                    ),
-                ]
-            )
+        return caja_error(
+            etiquetas["ERROR_LOADING_DETAIL"],
+            size=20,
         )
     
     def _actualizar_carta(self):

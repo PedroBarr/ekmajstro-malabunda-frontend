@@ -52,6 +52,18 @@ class PersonaVista:
                 )
 
                 self._actualizar_persona()
+            else:
+                self.vista.controls = [
+                    caja_cargando(
+                        etiquetas["LOADING_SYNC"],
+                        size=20,
+                    )
+                ]
+                self.pagina.update()
+                nueva_persona = await ClienteAPI().crear_persona(self.persona)
+                if nueva_persona and nueva_persona.id:
+                    ruta_nueva = rutas[etiquetas["DETAIL"]](nueva_persona.id)
+                    await self.pagina.push_route(ruta_nueva)
 
         except Exception as e: self.persona = None
         

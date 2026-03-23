@@ -95,3 +95,14 @@ class ClienteAPI:
         )
         respuesta.raise_for_status()
         return Persona(**respuesta.json())
+    
+    @envolver_peticion
+    async def crear_persona(self, cliente: httpx.AsyncClient, persona: Persona):
+        brutos = persona.model_dump(by_alias=True)
+        if "_id" in brutos: del brutos["_id"]
+        respuesta = await cliente.post(
+            self._enlace('personas'),
+            json=brutos
+        )
+        respuesta.raise_for_status()
+        return Persona(**respuesta.json())

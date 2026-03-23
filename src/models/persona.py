@@ -28,8 +28,11 @@ class Persona(BaseModel):
     apellido: str
     metadatos: Optional[Dict[str, Any]] = \
         Field(default_factory=dict, alias="metadata")
-    modificado: Optional[datetime] = \
-        Field(default_factory=datetime.now, alias="updatedAt")
+    modificado: Optional[datetime] = Field(
+        default_factory=datetime.now,
+        alias="updatedAt",
+        exclude=True
+    )
     
     model_config = {"populate_by_name": True,}
 
@@ -79,6 +82,11 @@ class Persona(BaseModel):
             if valor_actual != valor_nuevo: cambios[f"metadata.{clave}"] = valor_nuevo
 
         return cambios
+
+    def es_cargable(self) -> bool:
+        return (
+            self.apellido and self.apellido != ""
+        )
 
     @classmethod
     def sintetizar(

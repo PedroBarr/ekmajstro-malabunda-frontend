@@ -48,7 +48,11 @@ class ClienteAPI:
         # Envoltura asíncrona para manejar la petición a la API
         async def envoltorio(self, *args, **kwargs):
             async with httpx.AsyncClient(timeout=self.tiempo_espera) as cliente:
-                try: return await funcion(self, cliente, *args, **kwargs)
+                try:
+                    if kwargs.get("forzar_exc"):
+                        raise Exception(etiquetas["EXCEPTION_FORCED"])
+                    
+                    return await funcion(self, cliente, *args, **kwargs)
                 except httpx.HTTPStatusError as exc:
                     print(
                         etiquetas["EXCEPTION_API_RESPONSE"](
@@ -58,6 +62,8 @@ class ClienteAPI:
                     )
                 except Exception as exc:
                     print(etiquetas["EXCEPTION_UNEXPECTED"](exc))
+                    if not kwargs.get("omitir_exc"): raise exc
+
         return envoltorio
 
     # Función asíncrona envuelta: Obtener la configuración

@@ -44,11 +44,13 @@ etiquetas = {
     # Aserciones
     "ASSERT_PAGE_PARAM": "La propiedad 'pagina' debe ser una instancia de ft.Page",
     "ASSERT_API_PARAM": "La propiedad 'api' debe ser una instancia de ClienteAPI",
+    "ASSERT_CAJA_PARAM": "Debe proporcionar un mensaje o un componente.",
 
     # Excepciones
     "EXCEPTION_API_RESPONSE":
         lambda estatus, texto: f"Error en la respuesta de la API: {estatus} - {texto}",
     "EXCEPTION_UNEXPECTED": lambda exc: f"Error inesperado: {exc}",
+    "EXCEPTION_FORCED": "Excepción forzada para pruebas.",
 }
 
 # constantes de configuración de la API

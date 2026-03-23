@@ -19,6 +19,7 @@ from api_client import ClienteAPI
 
 from models.persona import Persona
 from components.fila_lista import fila_lista
+from components.caja_mensaje import caja_error
 
 ruta = rutas[etiquetas["LIST"]]
 
@@ -50,8 +51,9 @@ class Lista:
         try: personas: list[Persona] = await ClienteAPI().obtener_personas()
         except Exception as e:
             self.vista_lista.controls.append(
-                ft.Text(etiquetas["ERROR_LOADING_LIST"])
+                caja_error(etiquetas["ERROR_LOADING_LIST"])
             )
+            
             personas = []
         
         for persona in personas:

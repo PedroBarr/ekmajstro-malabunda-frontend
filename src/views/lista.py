@@ -41,8 +41,38 @@ class Lista:
         self.vista = self.construir()
     
     # Función asíncrona: Ir a la vista de detalle de una persona
-    async def ir_a_detalle(self, persona_id):
+    async def ir_a_detalle(self, persona_id = None):
         await self.pagina.push_route(rutas[etiquetas["DETAIL"]](persona_id))
+
+    def _agregar_boton_crear(self):
+        self.vista_lista.controls.insert(
+            0,
+            ft.Button(
+                content=ft.Row(
+                    [
+                        ft.Icon(
+                            ft.Icons.ADD,
+                            color=ft.Colors.WHITE,
+                            size=25,
+                        ),
+                        ft.Container(width=10),
+                        ft.Text(
+                            etiquetas["ADD_PERSON"],
+                            color=ft.Colors.WHITE,
+                            size=16,
+                            weight=ft.FontWeight.BOLD,
+                        ),
+                        ft.Container(width=25),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=5
+                ),
+                expand=True,
+                height=50,
+                bgcolor=ft.Colors.PRIMARY,
+                on_click=lambda e: asyncio.create_task(self.ir_a_detalle()),
+            )
+        )
 
     # Función asíncrona: Obtener la lista de personas
     #  y actualizar la vista con los datos obtenidos
@@ -64,6 +94,7 @@ class Lista:
                 )
             )
 
+        self._agregar_boton_crear()
         self.vista.controls = [self.vista_lista]
         self.pagina.update()
 

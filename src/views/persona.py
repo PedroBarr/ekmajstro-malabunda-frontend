@@ -9,16 +9,15 @@ from api_client import ClienteAPI
 from models.persona import Persona
 
 from components.carta_persona import CartaPersona
-from components.campo_editable import CampoEditable
 
 ruta = rutas[etiquetas["DETAIL"]](":id")
 
 class PersonaVista:
-    def __init__(self, pagina: ft.View):
+    def __init__(self, pagina: ft.Page, es_creacion: bool = False):
         self.pagina = pagina
         self.persona: Persona = Persona.sintetizar()
         self._actualizar_persona()
-        self.construir()
+        self.construir(es_creacion=es_creacion)
 
     def _actualizar_persona(self):
         self._persona = Persona.sintetizar(persona=self.persona)
@@ -103,8 +102,8 @@ class PersonaVista:
             self._controles() if self.persona else self._carta_fallida()
         ]
 
-    def construir(self):
+    def construir(self, es_creacion=False):
         self.vista = ft.View(
-            route=ruta,
+            route=ruta if not es_creacion else "/persona",
             controls=[self._controles()],
         )

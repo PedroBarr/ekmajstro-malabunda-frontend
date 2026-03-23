@@ -57,7 +57,7 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
     # Método: agregar el botón a la página
     def agregar_a_pagina(self):
         if self.debe_agregarse():
-            self.pagina.floating_action_button = self
+            self.pagina.views[-1].floating_action_button = self
 
     # Método de clase: obtener la ejemplificación única del botón
     @classmethod

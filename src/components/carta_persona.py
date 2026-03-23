@@ -98,6 +98,7 @@ class CartaPersona(ft.Card):
         )
     
     def _marca_tiempo(self):
+        if not self.persona.id: return ft.Container()
         return ft.Container(
             alignment=ft.Alignment.BOTTOM_RIGHT,
             content=ft.Text(

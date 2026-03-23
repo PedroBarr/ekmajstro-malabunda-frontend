@@ -37,8 +37,6 @@ class Enrutador:
     
     # Función asíncrona: Enrutador de la aplicación
     async def enrutador(self, e):
-        self.pagina.views.clear()
-
         if self.pagina.route == ruta_bienvenida:
             self.pagina.views.append(await Bienvenida(self.pagina))
         elif self.pagina.route == ruta_lista:
@@ -61,7 +59,8 @@ class Enrutador:
     async def pinchar_vista(self, e):
         if len(self.pagina.views) > 1:
             self.pagina.views.pop()
-            await self.pagina.push_route(self.pagina.views[-1].route)
+            if e not in [True]:
+                await self.pagina.push_route(self.pagina.views[-1].route)
 
     # Método de clase: obtener la ejemplificación única del botón
     @classmethod

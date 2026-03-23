@@ -21,7 +21,11 @@ from components.BFA_principal import BotonFlotanteAccionPrincipal
 
 from views.bienvenida import ruta as ruta_bienvenida, Bienvenida
 from views.lista import ruta as ruta_lista, Lista
-from views.persona import ruta as ruta_persona, PersonaVista
+from views.persona import (
+    ruta as ruta_persona,
+    ruta_creacion as ruta_persona_creacion,
+    PersonaVista
+)
 
 class Enrutador:
     """ Clase: Enrutador
@@ -44,8 +48,15 @@ class Enrutador:
             self.pagina.views.append(lista.vista)
             self.pagina.update()
             asyncio.create_task(lista.obtener_personas())
-        elif es_ruta(ruta_persona, self.pagina.route):
-            persona = PersonaVista(self.pagina)
+        elif (
+            es_ruta(ruta_persona, self.pagina.route) or
+            self.pagina.route == ruta_persona_creacion
+        ):
+            persona = PersonaVista(
+                self.pagina,
+                es_creacion=self.pagina.route == ruta_persona_creacion
+            )
+            
             self.pagina.views.append(persona.vista)
             asyncio.create_task(persona.cargar_datos())
 

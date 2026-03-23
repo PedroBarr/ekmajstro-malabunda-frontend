@@ -11,6 +11,7 @@ from models.persona import Persona
 from components.carta_persona import CartaPersona
 
 ruta = rutas[etiquetas["DETAIL"]](":id")
+ruta_creacion = rutas[etiquetas["DETAIL"]](None)
 
 class PersonaVista:
     def __init__(self, pagina: ft.Page, es_creacion: bool = False):
@@ -104,6 +105,6 @@ class PersonaVista:
 
     def construir(self, es_creacion=False):
         self.vista = ft.View(
-            route=ruta if not es_creacion else "/persona",
+            route=ruta if not es_creacion else ruta_creacion,
             controls=[self._controles()],
         )

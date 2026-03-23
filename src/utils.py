@@ -20,7 +20,7 @@ from consts import etiquetas
 rutas = {
     etiquetas["HOME"]: "/",
     etiquetas["LIST"]: "/lista",
-    etiquetas["DETAIL"]: lambda id: f"/persona/{id}",
+    etiquetas["DETAIL"]: lambda id: f"/persona/{id}" if id else "/persona",
 }
 
 # Función asíncrona: Ir a la vista de inicio

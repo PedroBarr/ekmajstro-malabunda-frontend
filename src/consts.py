@@ -32,6 +32,11 @@ etiquetas = {
 
     "LIST_TITLE": "Lista de Personas",
     "ERROR_LOADING_LIST": "Error al cargar la lista.",
+    "ADD_PERSON": "Agregar Persona",
+
+    "ERROR_LOADING_DETAIL": "Error al cargar la persona.",
+    "UNCOMPLETED_FIELDS": "Por favor, completa todos los campos.",
+    "LOADING_SYNC": "Sincronizando cambios...",
 
     # Navegación
     "TOOLTIP_HOME": "Volver al Inicio",

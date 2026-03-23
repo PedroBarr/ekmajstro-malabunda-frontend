@@ -31,31 +31,36 @@ class PersonaVista:
 
     async def cargar_datos(self):
         self._obtener_id()
-        
-        try:
-            self.persona = await ClienteAPI().obtener_persona(
-                self.persona.id
-            )
-            self._actualizar_persona()
-        except Exception as e: self.persona = None
+        if self.persona.id:
+            try:
+                self.persona = await ClienteAPI().obtener_persona(
+                    self.persona.id
+                )
+                self._actualizar_persona()
+            except Exception as e: self.persona = None
 
         self._actualizar_carta()
         self.pagina.update()
-
+        
     async def _sincronizar_cambios(self, cambios: dict):
         try:
-            await ClienteAPI().parchar_persona(
-                self.persona.id,
-                cambios
-            )
-            self._actualizar_persona()
+            if self.persona.id:
+                await ClienteAPI().parchar_persona(
+                    self.persona.id,
+                    cambios
+                )
+
+                self._actualizar_persona()
+
         except Exception as e: self.persona = None
         
 
     async def _modificar_persona(self, persona: Persona):
         cambios = self._persona.cambios(persona)
         if cambios:
-            asyncio.create_task(self._sincronizar_cambios(cambios))
+            if persona.es_cargable():
+                asyncio.create_task(self._sincronizar_cambios(cambios))
+            else: print(etiquetas["UNCOMPLETED_FIELDS"])
                     
         self.persona = persona
         self._actualizar_carta()
@@ -89,7 +94,7 @@ class PersonaVista:
                         alignment=ft.MainAxisAlignment.CENTER,
                         controls=[
                             ft.Text(
-                                "Error al cargar los datos de la persona.",
+                                etiquetas["ERROR_LOADING_DETAIL"],
                                 size=20
                             )
                         ]

@@ -28,7 +28,20 @@ class PersonaVista:
         ruta_actual = self.pagina.route
         patron = rutas[etiquetas["DETAIL"]](r"([A-Za-z0-9]+)")
         coincidencia = re.match(patron, ruta_actual)
-        if coincidencia: self.persona.id = coincidencia.group(1)
+        if coincidencia:
+            self.persona.id = coincidencia.group(1)
+        else:
+            asyncio.create_task(self._validar_ruta_inutil())
+
+    async def _validar_ruta_inutil(self):
+        terna_vistas = self.pagina.views[-3:] if len(self.pagina.views) >= 3 else self.pagina.views
+        if (
+            terna_vistas[0].route == terna_vistas[-1].route == "/persona" and
+            terna_vistas[1].route == ruta
+        ):
+            await self.pagina.on_view_pop(True)
+            await self.pagina.on_view_pop(True)
+            await self.pagina.on_view_pop(None)
 
     async def cargar_datos(self):
         self._obtener_id()

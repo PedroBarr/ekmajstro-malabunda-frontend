@@ -20,7 +20,8 @@ from consts import etiquetas
 rutas = {
     etiquetas["HOME"]: "/",
     etiquetas["LIST"]: "/lista",
-    etiquetas["DETAIL"]: lambda id: f"/persona/{id}" if id else "/persona",
+    etiquetas["DETAIL"]: lambda id: \
+        f"/persona/{id}" if id else "/persona",
 }
 
 # Función asíncrona: Ir a la vista de inicio
@@ -28,6 +29,8 @@ async def ir_a_inicio(pagina: ft.Page):
     if pagina.route != rutas[etiquetas["HOME"]]:
         await pagina.push_route(rutas[etiquetas["HOME"]])
 
+# Función: Identificar si ruta argumentada coincide con ruta
+#  parametrizada
 def es_ruta(ruta_objetivo: str, ruta_actual: str) -> bool:
     ruta_regex = re.sub(r":\w+", r"[^/]+", ruta_objetivo)
     ruta_regex = f"^{ruta_regex}$"

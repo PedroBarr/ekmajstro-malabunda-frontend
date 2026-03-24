@@ -28,6 +28,8 @@ class Persona(BaseModel):
     apellido: str
     metadatos: Optional[Dict[str, Any]] = \
         Field(default_factory=dict, alias="metadata")
+    
+    # Campo para controlar la fecha de modificación, sin sintezación
     modificado: Optional[datetime] = Field(
         default_factory=datetime.now,
         alias="updatedAt",
@@ -36,17 +38,30 @@ class Persona(BaseModel):
     
     model_config = {"populate_by_name": True,}
 
+    # Función: obtener imagen dinámica
     def imagen(self) -> ft.Control:
+        # Opción: Existe imagen en metadatos
         imagen = self.metadatos.get("imagen")
+
+        # Opción: Usar iniciales del nombre y apellido
         iniciales = (
             (self.nombre[0] if self.nombre else "") +
             (self.apellido[0] if self.apellido else "")
         )
 
+        # Opción: No existen datos
         guardaespacio = "?" if not iniciales else iniciales.upper()
 
+        # Retornar imagen si existe
         if imagen:
-            return ft.Image(src=imagen, width=50, height=50, fit=ft.ImageFit.COVER)
+            return ft.Image(
+                src=imagen,
+                width=50,
+                height=50,
+                fit=ft.ImageFit.COVER,
+            )
+        
+        # Retornar cadena si no existe imagen
         else:
             return ft.Text(
                 guardaespacio,
@@ -54,40 +69,52 @@ class Persona(BaseModel):
                 weight=ft.FontWeight.BOLD,
                 color=ft.Colors.WHITE,
             )
-        
+
+    # Función: obtener marca de tiempo de modificación
     def marca_tiempo_modificacion(self) -> str:
         if not self.modificado: return ""
         return self.modificado.strftime("%Y-%m-%d %H:%M:%S")
-        
+
+    # Función: modificar campos de la persona a partir de un diccionario
     def modificar(self, dicc: Dict[str, Any]):
         for clave, valor in dicc.items():
             if hasattr(self, clave): setattr(self, clave, valor)
 
+    # Función: calcular cambios con respecto a otra persona
     def cambios(self, persona: "Persona") -> Dict[str, Any]:
         cambios = {}
+
+        # Comparar campos directos
         for campo in self.__class__.model_fields:
             valor_actual = getattr(self, campo)
             valor_nuevo = getattr(persona, campo)
             if campo == "metadatos": continue
-            if valor_actual != valor_nuevo: cambios[campo] = valor_nuevo
+            
+            if valor_actual != valor_nuevo:
+                cambios[campo] = valor_nuevo
         
         claves_metadatos = (
             set(self.metadatos.keys()) |
             set(persona.metadatos.keys())
         )
         
+        # Comparar campos de metadatos
         for clave in claves_metadatos:
             valor_actual = self.metadatos.get(clave) or None
             valor_nuevo = persona.metadatos.get(clave) or None
-            if valor_actual != valor_nuevo: cambios[f"metadata.{clave}"] = valor_nuevo
+            
+            if valor_actual != valor_nuevo:
+                cambios[f"metadata.{clave}"] = valor_nuevo
 
         return cambios
 
+    # Función: Validar si se puede cargar la persona a la API
     def es_cargable(self) -> bool:
         return (
             self.apellido and self.apellido != ""
         )
 
+    # Método de clase: sintetizar (parse) persona
     @classmethod
     def sintetizar(
         cls,

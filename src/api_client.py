@@ -49,6 +49,7 @@ class ClienteAPI:
         async def envoltorio(self, *args, **kwargs):
             async with httpx.AsyncClient(timeout=self.tiempo_espera) as cliente:
                 try:
+                    # parámetro para forzar excepciones en pruebas
                     if kwargs.get("forzar_exc"):
                         raise Exception(etiquetas["EXCEPTION_FORCED"])
                     
@@ -62,6 +63,8 @@ class ClienteAPI:
                     )
                 except Exception as exc:
                     print(etiquetas["EXCEPTION_UNEXPECTED"](exc))
+
+                    # parámetro para omitir excepciones
                     if not kwargs.get("omitir_exc"): raise exc
 
         return envoltorio
@@ -87,12 +90,17 @@ class ClienteAPI:
         respuesta.raise_for_status()
         return [Persona(**persona) for persona in respuesta.json()]
     
+    # Función asíncrona envuelta: Obtener una persona específica por su ID
+    #  desde la API y devolverla como un objeto Persona
     @envolver_peticion
     async def obtener_persona(self, cliente: httpx.AsyncClient, id: str):
         respuesta = await cliente.get(f"{self._enlace('persona')}".format(id=id))
         respuesta.raise_for_status()
         return Persona(**respuesta.json())
     
+    # Función asíncrona envuelta: Parchar (actualizar parcialmente) una persona
+    #  en la API con los cambios proporcionados y devolver la persona actualizada
+    #  como un objeto Persona
     @envolver_peticion
     async def parchar_persona(self, cliente: httpx.AsyncClient, id: str, cambios: dict):
         respuesta = await cliente.patch(
@@ -102,6 +110,8 @@ class ClienteAPI:
         respuesta.raise_for_status()
         return Persona(**respuesta.json())
     
+    # Función asíncrona envuelta: Crear una nueva persona en la API con los datos
+    #  proporcionados y devolver la persona creada como un objeto Persona
     @envolver_peticion
     async def crear_persona(self, cliente: httpx.AsyncClient, persona: Persona):
         brutos = persona.model_dump(by_alias=True)

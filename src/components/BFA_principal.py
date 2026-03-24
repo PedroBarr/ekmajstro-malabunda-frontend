@@ -31,7 +31,6 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
     def __init__(self, pagina: ft.Page):
         super().__init__()
         self.pagina = pagina
-        #apply filter invert 50% to the image
         self.content = ft.Image(
             src="favicon.svg",
             width=36,
@@ -60,7 +59,7 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
             self.pagina.views
         )
 
-    # Método: agregar el botón a la página
+    # Método: agregar el botón a la vista actual
     def agregar_a_pagina(self):
         if self.debe_agregarse():
             self.pagina.views[-1].floating_action_button = self

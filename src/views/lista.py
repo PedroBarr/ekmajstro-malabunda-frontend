@@ -44,6 +44,7 @@ class Lista:
     async def ir_a_detalle(self, persona_id = None):
         await self.pagina.push_route(rutas[etiquetas["DETAIL"]](persona_id))
 
+    # Función: Agregar un botón para crear una nueva persona
     def _agregar_boton_crear(self):
         self.vista_lista.controls.insert(
             0,
@@ -70,7 +71,8 @@ class Lista:
                 expand=True,
                 height=50,
                 bgcolor=ft.Colors.PRIMARY,
-                on_click=lambda e: asyncio.create_task(self.ir_a_detalle()),
+                on_click=lambda e: \
+                    asyncio.create_task(self.ir_a_detalle()),
             )
         )
 
@@ -78,12 +80,16 @@ class Lista:
     #  y actualizar la vista con los datos obtenidos
     async def obtener_personas(self):
         self.vista_lista.controls.clear()
-        try: personas: list[Persona] = await ClienteAPI().obtener_personas()
+        try:
+            personas: list[Persona] = \
+                await ClienteAPI().obtener_personas()
+            
         except Exception as e:
             self.vista_lista.controls.append(
                 caja_error(etiquetas["ERROR_LOADING_LIST"])
             )
             
+            # Para manejar excesión en que no trae datos
             personas = []
         
         for persona in personas:
@@ -98,6 +104,7 @@ class Lista:
         self.vista.controls = [self.vista_lista]
         self.pagina.update()
 
+    # Función: Construir la vista de lista de personas
     def construir(self):
         return ft.View(
             route=ruta,
@@ -113,7 +120,8 @@ class Lista:
                         ),
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    horizontal_alignment=\
+                        ft.CrossAxisAlignment.CENTER,
                 ),],
                 alignment=ft.MainAxisAlignment.CENTER,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,

@@ -1,6 +1,27 @@
+#-------------------------------------------------------------------------------
+# Nombre:      Temas de la aplicación
+# Proposito:   Contiene funciones relacionadas con la configuración
+#              de temas y estilos de la aplicación
+#
+# Autor:       Aref
+#
+# Creado:      23/3/1999+19+9-1
+# Derechos
+# de autor:    (k) Alta Lengua 2026
+# Licencia:    <GPLv3>
+#-------------------------------------------------------------------------------
+
 import flet as ft
 
 def tema_ekmajstro() -> ft.Theme:
+    """ Función: Tema principal (Ekmajstro)
+
+    Retorna la configuración de estilos y colores principal.
+
+    Retorno:
+        una instancia de ft.Theme con las configuraciones de
+        estilo y color de la aplicación.
+    """
     return ft.Theme(
         scaffold_bgcolor="0xFF242424",
         color_scheme=ft.ColorScheme(
@@ -28,5 +49,5 @@ def tema_ekmajstro() -> ft.Theme:
         ),
     )
 
-
+# Configuración de modo de tema (oscuro)
 tema_modo = ft.ThemeMode.DARK

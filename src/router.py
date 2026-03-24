@@ -70,6 +70,8 @@ class Enrutador:
     async def pinchar_vista(self, e):
         if len(self.pagina.views) > 1:
             self.pagina.views.pop()
+
+            # Para evitar el enrutamiento
             if e not in [True]:
                 await self.pagina.push_route(self.pagina.views[-1].route)
 

@@ -17,6 +17,7 @@ import asyncio
 from consts import etiquetas
 from api_client import ClienteAPI
 from router import Enrutador
+from themes import tema_modo, tema_ekmajstro
 
 from components.BFA_principal import BotonFlotanteAccionPrincipal
 from views.bienvenida import elemento_bienvenida
@@ -24,7 +25,8 @@ from views.bienvenida import elemento_bienvenida
 # Función: Configurar la página principal de la aplicación
 def configurar(pagina: ft.Page):
     pagina.title = etiquetas["LOADING"]
-    pagina.theme_mode = ft.ThemeMode.DARK
+    pagina.theme_mode = tema_modo
+    pagina.theme = tema_ekmajstro()
 
     # Inicializar objetos de ejemplificación única
     BotonFlotanteAccionPrincipal.instancia(pagina)

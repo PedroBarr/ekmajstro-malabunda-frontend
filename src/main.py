@@ -57,6 +57,6 @@ async def index(pagina: ft.Page):
     await Enrutador.instancia().enrutador(None)
 
 # Función: Ejecutar la aplicación
-def main(): ft.run(index)
+def main(): ft.run(index, assets_dir="assets")
 
 if __name__ == "__main__": main()

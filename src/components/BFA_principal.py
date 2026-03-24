@@ -31,7 +31,13 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
     def __init__(self, pagina: ft.Page):
         super().__init__()
         self.pagina = pagina
-        self.icon = ft.Icon(ft.Icons.HOME, color=ft.Colors.WHITE)
+        #apply filter invert 50% to the image
+        self.content = ft.Image(
+            src="favicon.svg",
+            width=36,
+            height=36,
+            color=ft.Colors.with_opacity(0.75, ft.Colors.WHITE),
+        )
         self.on_click = lambda _: \
             asyncio.create_task(ir_a_inicio(self.pagina))
 

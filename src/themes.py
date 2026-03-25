@@ -51,3 +51,5 @@ def tema_ekmajstro() -> ft.Theme:
 
 # Configuración de modo de tema (oscuro)
 tema_modo = ft.ThemeMode.DARK
+
+estilos_config = {}

@@ -17,7 +17,7 @@ import asyncio
 from consts import etiquetas
 from api_client import ClienteAPI
 from router import Enrutador
-from themes import tema_modo, tema_ekmajstro
+from themes import tema_modo, tema_ekmajstro, estilos_config
 
 from components.BFA_principal import BotonFlotanteAccionPrincipal
 from views.bienvenida import elemento_bienvenida
@@ -49,8 +49,14 @@ async def cargar_configuracion(pagina: ft.Page):
         pagina.title = config['nombre']
         elemento_bienvenida.value = \
             etiquetas["WELCOME_MESSAGE"](config['nombre'])
-        
-        pagina.update()
+
+    if config.get('tipos_relacion'):
+        if config['tipos_relacion'].get('estilos'):
+            estilos_config.update({
+                'tipos_relacion': config['tipos_relacion']['estilos'],
+            })
+
+    pagina.update()
 
 # Función asíncrona: Vista de inicio de la aplicación
 async def index(pagina: ft.Page):

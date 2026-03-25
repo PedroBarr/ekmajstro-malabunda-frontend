@@ -22,6 +22,7 @@ enlaces = {
     'nombre': lambda api: f'{api}',
     'personas': lambda api: f'{api}/personas',
     'persona': lambda api: f'{api}/personas/{{id}}',
+    'config_tipos_relacion': lambda api: f'{api}/tipos_relacion/config',
 }
 
 class ClienteAPI:
@@ -80,9 +81,22 @@ class ClienteAPI:
         respuesta = await cliente.get(self._enlace('nombre'))
         respuesta.raise_for_status()
         nombre = respuesta.text.strip() if respuesta.text.strip() else None
+
+        # Tipos relacion
+        respuesta = await cliente.get(self._enlace('config_tipos_relacion'))
+        respuesta.raise_for_status()
+        config_tipos_relacion = respuesta.json()
+        estilos_tipos_relacion = config_tipos_relacion.get('estilo', {})
+        tipos_relacion = config_tipos_relacion.get('tipos', [])
+        cantidad_tipos_relacion = config_tipos_relacion.get('cantidad', len(tipos_relacion))
         
         return {
-            'nombre': nombre
+            'nombre': nombre,
+            'tipos_relacion': {
+                'estilos': estilos_tipos_relacion,
+                'tipos': tipos_relacion,
+                'cantidad': cantidad_tipos_relacion,
+            }
         }
 
     # Función asíncrona envuelta: Obtener la lista de personas

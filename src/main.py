@@ -23,7 +23,7 @@ from components.BFA_principal import BotonFlotanteAccionPrincipal
 from views.bienvenida import elemento_bienvenida
 
 # Función: Configurar la página principal de la aplicación
-def configurar(pagina: ft.Page):
+async def configurar(pagina: ft.Page):
     pagina.title = etiquetas["LOADING"]
     pagina.theme_mode = tema_modo
     pagina.theme = tema_ekmajstro()
@@ -36,17 +36,16 @@ def configurar(pagina: ft.Page):
     pagina.on_route_change = enrutador.enrutador
     pagina.on_view_pop = enrutador.pinchar_vista
 
-    asyncio.create_task(cargar_configuracion(pagina))
+    await cargar_configuracion(pagina)
 
 # Función asíncrona: Cargar la configuración de la aplicación
 async def cargar_configuracion(pagina: ft.Page):
     try: config = await ClienteAPI().obtener_config()
     except Exception as e:
         elemento_bienvenida.value = etiquetas["ERROR_LOADING_CONFIG"]
-        pagina.update()
-        return
+        config = {}
     
-    if config['nombre']:
+    if config.get('nombre'):
         pagina.title = config['nombre']
         elemento_bienvenida.value = \
             etiquetas["WELCOME_MESSAGE"](config['nombre'])
@@ -55,7 +54,7 @@ async def cargar_configuracion(pagina: ft.Page):
 
 # Función asíncrona: Vista de inicio de la aplicación
 async def index(pagina: ft.Page):
-    configurar(pagina)
+    await configurar(pagina)
     await Enrutador.instancia().enrutador(None)
 
 # Función: Ejecutar la aplicación

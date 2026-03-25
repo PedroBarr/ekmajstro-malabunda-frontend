@@ -61,6 +61,9 @@ class ClienteAPI:
                             exc.response.text
                         )
                     )
+
+                    if not kwargs.get("omitir_exc"): raise exc
+                    
                 except Exception as exc:
                     print(etiquetas["EXCEPTION_UNEXPECTED"](exc))
 

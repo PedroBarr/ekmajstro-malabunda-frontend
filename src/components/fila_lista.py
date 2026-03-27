@@ -14,6 +14,9 @@
 import flet as ft
 
 from consts import etiquetas
+
+from components.contador_relaciones import contador_relaciones
+
 from models.persona import PersonaElemento
 from models import colores_tipo_relacion
 
@@ -40,6 +43,9 @@ def fila_lista(persona: PersonaElemento, on_click: callable):
                     ],
                     spacing=2,
                 ),
+                ft.Container(expand=True),
+                contador_relaciones(persona.relaciones),
+                ft.Container(width=20),
             ],
         ),
         on_click=lambda _: on_click(persona),

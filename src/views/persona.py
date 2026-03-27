@@ -40,7 +40,10 @@ class PersonaVista:
     # Método dunder de inicialización
     def __init__(self, pagina: ft.Page, es_creacion: bool = False):
         self.pagina = pagina
+
         self.persona: Persona = Persona.sintetizar()
+        self.relaciones_contadores = {}
+        
         self._actualizar_persona()
         self.construir(es_creacion=es_creacion)
 
@@ -154,6 +157,7 @@ class PersonaVista:
             controls=[
                 CartaPersona(
                     persona=self.persona,
+                    relaciones=self.relaciones_contadores,
                     al_cambio=lambda p: \
                         asyncio.create_task(self._modificar_persona(p)),
                     editable=True,

@@ -12,10 +12,12 @@
 #-------------------------------------------------------------------------------
 
 import flet as ft
+from typing import Dict
 
 from models.persona import Persona
 
 from components.campo_editable import CampoEditable
+from components.contador_relaciones import contador_relaciones
 
 class CartaPersona(ft.Card):
     """ Clase: Carta Persona
@@ -30,12 +32,14 @@ class CartaPersona(ft.Card):
         self,
         persona: Persona,
         al_cambio: callable,
+        relaciones: Dict[str, int] = {},
         editable: bool = True,
         **param_contenedor
     ):
         super().__init__(**param_contenedor)
         self.persona = persona
         self.al_cambio = al_cambio
+        self.relaciones = relaciones
 
         self._es_editable = editable
 
@@ -136,6 +140,25 @@ class CartaPersona(ft.Card):
                 weight=ft.FontWeight.BOLD,
             ),
         )
+    
+    def _cuerpo(self):
+        return ft.Container(
+            content=ft.Column(
+                [
+                    ft.Row(
+                        controls=[
+                            ft.Container(expand=3),
+                            contador_relaciones(
+                                self.relaciones
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.END,
+                    ),
+                ],
+                spacing=10,
+            ),
+            expand=True,
+        )
 
     # Función: Construir componente
     def _construir(self):
@@ -147,6 +170,7 @@ class CartaPersona(ft.Card):
                 controls=[
                     self._cabecera(),
                     self._divisor(),
+                    self._cuerpo(),
                     self._marca_tiempo(),
                 ]
             ),

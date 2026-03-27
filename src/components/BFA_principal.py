@@ -31,7 +31,6 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
     def __init__(self, pagina: ft.Page):
         super().__init__()
         self.pagina = pagina
-        self._floating_action_button = None
         self.content = ft.Image(
             src="favicon.svg",
             width=36,
@@ -57,9 +56,7 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
     def debe_agregarse(self):
         return (
             self.pagina.route != ruta_bienvenida and
-            self.pagina.views and
-            hasattr(self.pagina.views[-1], "floating_action_button") and
-            self.pagina.views[-1].floating_action_button is None
+            self.pagina.views
         )
 
     # Método: agregar el botón a la vista actual
@@ -70,13 +67,6 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
     @property
     def floating_action_button(self):
         return None
-        try:
-            if not self._floating_action_button:
-                self._floating_action_button = self
-        except RecursionError:
-            self._floating_action_button = None
-        finally:
-            return self._floating_action_button
 
     # Método de clase: obtener la ejemplificación única del botón
     @classmethod

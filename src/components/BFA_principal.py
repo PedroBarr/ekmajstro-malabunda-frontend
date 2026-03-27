@@ -69,6 +69,7 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
 
     @property
     def floating_action_button(self):
+        return None
         try:
             if not self._floating_action_button:
                 self._floating_action_button = self

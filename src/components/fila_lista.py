@@ -18,9 +18,30 @@ from models.persona import PersonaElemento
 
 # Función: Crear una fila de lista con información de una persona
 def fila_lista(persona: PersonaElemento, on_click: callable):
-    return ft.ListTile(
-        leading=ft.CircleAvatar(),
-        title=ft.Text(f'{persona.apellido}, {persona.nombre}'),
-        subtitle=ft.Text(etiquetas["ID_LABEL"](persona.id)),
-        on_click=lambda _: on_click(persona)
+    return ft.Container(
+        content=ft.Row(
+            [
+                persona.foto_perfil(22),
+                ft.Container(width=10),
+                ft.Column(
+                    [
+                        ft.Text(
+                            f'{persona.apellido}, {persona.nombre}',
+                            size=19,
+                            weight=ft.FontWeight.W_900,
+                            color=ft.Colors.GREY_400,
+                        ),
+                        ft.Text(
+                            etiquetas["ID_LABEL"](persona.id),
+                            size=14,
+                            color=ft.Colors.GREY,
+                        ),
+                    ],
+                    spacing=2,
+                ),
+            ],
+        ),
+        on_click=lambda _: on_click(persona),
+        padding=10,
+        border_radius=5,
     )

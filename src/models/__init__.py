@@ -26,6 +26,7 @@ from themes import estilos_config
 
 def colores_tipo_relacion(persona: PersonaElemento) -> list[ft.Colors]:
     colores: list[ft.Colors] = []
+
     if estilos_config.get('tipos_relacion'):
         colores = [
             (
@@ -39,6 +40,6 @@ def colores_tipo_relacion(persona: PersonaElemento) -> list[ft.Colors]:
             if tipo in persona.relaciones.keys()
         ]
     
-    colores.extend([ft.Colors.TRANSPARENT] * len(colores))
+    colores.extend([ft.Colors.TRANSPARENT] * (len(colores) or 1))
     
     return colores

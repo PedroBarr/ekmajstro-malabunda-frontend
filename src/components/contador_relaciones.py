@@ -37,7 +37,7 @@ def contador_relaciones(relaciones: dict[str, int]) -> ft.Control:
                 ],
                 spacing=0,
             ),
-            ft.Container(width=15),
+            ft.Container(expand=1),
             ft.Text(
                 str(sum(relaciones.values())),
                 size=40,
@@ -48,4 +48,5 @@ def contador_relaciones(relaciones: dict[str, int]) -> ft.Control:
             ),
         ],
         spacing=5,
+        expand=True,
     )

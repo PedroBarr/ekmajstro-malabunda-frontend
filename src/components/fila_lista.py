@@ -44,7 +44,9 @@ def fila_lista(persona: PersonaElemento, on_click: callable):
                     spacing=2,
                 ),
                 ft.Container(expand=True),
-                contador_relaciones(persona.relaciones),
+                ft.Container(
+                    content=contador_relaciones(persona.relaciones),
+                ),
                 ft.Container(width=20),
             ],
         ),

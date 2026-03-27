@@ -51,6 +51,10 @@ class PersonaVista:
     def _actualizar_persona(self):
         self._persona = Persona.sintetizar(persona=self.persona)
 
+    def _actualizar_relaciones_conteo(self, conteo: dict[str, int]):
+        self.relaciones_contadores = conteo
+        self._actualizar_carta()
+
     # Función: Obtener ID desde la ruta y procesarla
     def _obtener_id(self):
         ruta_actual = self.pagina.route
@@ -90,6 +94,12 @@ class PersonaVista:
                     self.persona.id
                 )
                 self._actualizar_persona()
+
+                asyncio.create_task(
+                    ClienteAPI().relaciones_conteo_persona(self.persona.id)
+                ).add_done_callback(
+                    lambda fut: self._actualizar_relaciones_conteo(fut.result())
+                )
             except Exception as e: self.persona = None
 
         self._actualizar_carta()

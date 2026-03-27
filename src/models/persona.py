@@ -180,3 +180,14 @@ class Persona(BaseModel):
             metadatos=_metadatos,
             modificado=_modificado,
         )
+    
+class PersonaElemento(Persona):
+    """ Clase: PersonaElemento
+        (Persona)
+
+    Extensión del modelo Persona para representar a una persona
+    como elemento en una lista de personas, con campos adicionales
+    para manejar las relaciones
+    """
+    relaciones: Dict[str, int] = \
+        Field(default_factory=dict, exclude=True)

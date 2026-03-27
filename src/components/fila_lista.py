@@ -14,10 +14,10 @@
 import flet as ft
 
 from consts import etiquetas
-from models.persona import Persona
+from models.persona import PersonaElemento
 
 # Función: Crear una fila de lista con información de una persona
-def fila_lista(persona: Persona, on_click: callable):
+def fila_lista(persona: PersonaElemento, on_click: callable):
     return ft.ListTile(
         leading=ft.CircleAvatar(),
         title=ft.Text(f'{persona.apellido}, {persona.nombre}'),

@@ -17,7 +17,7 @@ from consts import etiquetas
 from utils import rutas
 from api_client import ClienteAPI
 
-from models.persona import Persona
+from models.persona import PersonaElemento
 from components.fila_lista import fila_lista
 from components.caja_mensaje import caja_error
 
@@ -81,7 +81,7 @@ class Lista:
     async def obtener_personas(self):
         self.vista_lista.controls.clear()
         try:
-            personas: list[Persona] = \
+            personas: list[PersonaElemento] = \
                 await ClienteAPI().obtener_personas()
             
         except Exception as e:

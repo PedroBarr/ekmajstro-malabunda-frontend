@@ -15,7 +15,7 @@ import httpx
 
 from consts import api_url, api_tiempo_espera, etiquetas
 
-from models.persona import Persona
+from models.persona import Persona, PersonaElemento
 
 # Enlaces de la API para diferentes recursos
 enlaces = {
@@ -105,7 +105,7 @@ class ClienteAPI:
     async def obtener_personas(self, cliente: httpx.AsyncClient):
         respuesta = await cliente.get(self._enlace('personas'))
         respuesta.raise_for_status()
-        return [Persona(**persona) for persona in respuesta.json()]
+        return [PersonaElemento(**persona) for persona in respuesta.json()]
     
     # Función asíncrona envuelta: Obtener una persona específica por su ID
     #  desde la API y devolverla como un objeto Persona

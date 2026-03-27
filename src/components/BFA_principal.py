@@ -31,6 +31,7 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
     def __init__(self, pagina: ft.Page):
         super().__init__()
         self.pagina = pagina
+        self._floating_action_button = None
         self.content = ft.Image(
             src="favicon.svg",
             width=36,
@@ -68,7 +69,13 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
 
     @property
     def floating_action_button(self):
-        return self.pagina.floating_action_button
+        try:
+            if not self._floating_action_button:
+                self._floating_action_button = self
+        except RecursionError:
+            self._floating_action_button = None
+        finally:
+            return self._floating_action_button
 
     # Método de clase: obtener la ejemplificación única del botón
     @classmethod

@@ -56,7 +56,9 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
     def debe_agregarse(self):
         return (
             self.pagina.route != ruta_bienvenida and
-            self.pagina.views
+            self.pagina.views and
+            hasattr(self.pagina.views[-1], "floating_action_button") and
+            self.pagina.views[-1].floating_action_button is None
         )
 
     # Método: agregar el botón a la vista actual

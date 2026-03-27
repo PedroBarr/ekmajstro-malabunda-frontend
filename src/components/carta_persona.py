@@ -41,14 +41,6 @@ class CartaPersona(ft.Card):
 
         self._construir()
 
-    # Función: Obtener render de foto de perfil
-    def _foto_perfil(self):
-        return ft.CircleAvatar(
-            radius=30,
-            content=self.persona.imagen(),
-            bgcolor=ft.Colors.BLUE_GREY_700,
-        )
-    
     # Función: Modificar persona y disparar callback de cambio
     def _modificar_persona(self, cambios: dict):
         self.persona.modificar(cambios)
@@ -101,7 +93,7 @@ class CartaPersona(ft.Card):
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 vertical_alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
-                    self._foto_perfil(),
+                    self.persona.foto_perfil(),
                     self._info_cabecera(),
                 ]
             ),

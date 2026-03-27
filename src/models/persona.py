@@ -39,7 +39,11 @@ class Persona(BaseModel):
     model_config = {"populate_by_name": True,}
 
     # Función: obtener imagen dinámica
-    def imagen(self) -> ft.Control:
+    def imagen(
+        self,
+        medida: int = 50,
+        medida_fuente: int = 25,
+    ) -> ft.Control:
         # Opción: Existe imagen en metadatos
         imagen = self.metadatos.get("imagen")
 
@@ -56,8 +60,8 @@ class Persona(BaseModel):
         if imagen:
             return ft.Image(
                 src=imagen,
-                width=50,
-                height=50,
+                width=medida,
+                height=medida,
                 fit=ft.ImageFit.COVER,
             )
         
@@ -65,10 +69,21 @@ class Persona(BaseModel):
         else:
             return ft.Text(
                 guardaespacio,
-                size=25,
+                size=medida_fuente,
                 weight=ft.FontWeight.BOLD,
                 color=ft.Colors.WHITE,
+                style=ft.TextStyle(
+                    letter_spacing=3,
+                ),
             )
+        
+    # Función: Obtener render de foto de perfil
+    def foto_perfil(self, radio: int = 30) -> ft.Control:
+        return ft.CircleAvatar(
+            radius=radio,
+            content=self.imagen(radio, radio // 1.5),
+            bgcolor=ft.Colors.PRIMARY,
+        )
 
     # Función: obtener marca de tiempo de modificación
     def marca_tiempo_modificacion(self) -> str:

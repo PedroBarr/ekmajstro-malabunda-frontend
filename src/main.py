@@ -12,9 +12,8 @@
 #-------------------------------------------------------------------------------
 
 import flet as ft
-import asyncio
 
-from consts import etiquetas
+from consts import etiquetas, configuracion
 from api_client import ClienteAPI
 from router import Enrutador
 from themes import tema_modo, tema_ekmajstro, estilos_config
@@ -54,6 +53,11 @@ async def cargar_configuracion(pagina: ft.Page):
         if config['tipos_relacion'].get('estilos'):
             estilos_config.update({
                 'tipos_relacion': config['tipos_relacion']['estilos'],
+            })
+        
+        if config['tipos_relacion'].get('tipos'):
+            configuracion.update({
+                'tipos_relacion': config['tipos_relacion']['tipos'],
             })
 
     pagina.update()

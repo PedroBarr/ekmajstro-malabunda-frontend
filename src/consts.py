@@ -56,3 +56,5 @@ etiquetas = {
 # constantes de configuración de la API
 api_url = os.getenv("API_URL", "https://ekcion-malabunda-api.up.railway.app")
 api_tiempo_espera = 10.0
+
+configuracion = {}

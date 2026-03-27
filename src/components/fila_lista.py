@@ -15,6 +15,7 @@ import flet as ft
 
 from consts import etiquetas
 from models.persona import PersonaElemento
+from models import colores_tipo_relacion
 
 # Función: Crear una fila de lista con información de una persona
 def fila_lista(persona: PersonaElemento, on_click: callable):
@@ -44,4 +45,10 @@ def fila_lista(persona: PersonaElemento, on_click: callable):
         on_click=lambda _: on_click(persona),
         padding=10,
         border_radius=5,
+        gradient=ft.LinearGradient(
+            begin=ft.Alignment.BOTTOM_RIGHT,
+            end=ft.Alignment.TOP_LEFT,
+            colors=colores_tipo_relacion(persona),
+            rotation=0.4,
+        )
     )

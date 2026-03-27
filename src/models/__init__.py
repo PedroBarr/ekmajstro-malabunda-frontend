@@ -18,3 +18,25 @@ Empaquetar los modelos de datos de la aplicación Malabunda
 transformación, serialización y deserialización de datos en
 la aplicación.
 """
+
+import flet as ft
+
+from .persona import PersonaElemento
+from themes import estilos_config
+
+def colores_tipo_relacion(persona: PersonaElemento) -> list[ft.Colors]:
+    colores: list[ft.Colors] = []
+    if estilos_config.get('tipos_relacion'):
+        colores = [
+            (
+                ft.Colors.with_opacity(
+                    int(estilo.get('opacidad'), 16) / (255 * 1.8),
+                    estilo.get('color')
+                ) or
+                ft.Colors.TRANSPARENT
+            )
+            for tipo, estilo in estilos_config['tipos_relacion'].items()
+            if tipo in persona.relaciones.keys()
+        ]
+
+    return colores if colores else [ft.Colors.TRANSPARENT]

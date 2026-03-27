@@ -68,7 +68,7 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
 
     @property
     def floating_action_button(self):
-        return self
+        return self.pagina.floating_action_button
 
     # Método de clase: obtener la ejemplificación única del botón
     @classmethod

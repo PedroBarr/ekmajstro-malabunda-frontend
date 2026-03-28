@@ -18,9 +18,10 @@ from consts import etiquetas
 from utils import rutas
 from api_client import ClienteAPI
 
-from models.persona import Persona
+from models.persona import Persona, PersonaElemento
 
 from components.carta_persona import CartaPersona
+from components.fila_lista import fila_lista
 from components.caja_mensaje import caja_cargando, caja_error, caja_mensaje
 from components.conmutador import Conmutador
 
@@ -44,6 +45,7 @@ class PersonaVista:
 
         self.persona: Persona = Persona.sintetizar()
         self.relaciones_contadores = {}
+        self._personas: list[PersonaElemento] = []
 
         self.conmutador_principal = Conmutador(
             [
@@ -153,6 +155,12 @@ class PersonaVista:
                 ).add_done_callback(
                     lambda fut: self._actualizar_relaciones_conteo(fut.result())
                 )
+
+                asyncio.create_task(
+                    ClienteAPI().relaciones_personas_persona(self.persona.id)
+                ).add_done_callback(
+                    lambda fut: self._actualizar_personas(fut.result())
+                )
             except Exception as e: self.persona = None
 
         self._actualizar_carta()
@@ -258,9 +266,27 @@ class PersonaVista:
         )
 
     def _personas_componente(self):
-        return caja_mensaje(
+        return (
+            caja_mensaje(
                 mensaje="No hay personas relacionadas.",
             )
+            if not self._personas or self._personas == []
+            else ft.Column(
+                [
+                    fila_lista(
+                        persona,
+                        lambda p: asyncio.create_task(self.pagina.push_route(rutas[etiquetas["DETAIL"]](p.id)))
+                    )
+                    for persona in self._personas
+                ],
+                scroll=ft.ScrollMode.AUTO,
+                spacing=10,
+            )
+        )
+
+    def _actualizar_personas(self, personas: list[PersonaElemento]):
+        self._personas = personas
+        self._actualizar_conmutador_principal()
     
     def _actualizar_conmutador_principal(self):
         self._envoltura_conmutador_principal.content = \

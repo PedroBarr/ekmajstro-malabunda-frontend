@@ -146,3 +146,17 @@ class ClienteAPI:
         respuesta = await cliente.get(f"{self._enlace('relaciones_conteo_persona')}".format(id=id))
         respuesta.raise_for_status()
         return respuesta.json()
+    
+    @envolver_peticion
+    async def relaciones_personas_persona(self, cliente: httpx.AsyncClient, id: str):
+        respuesta = await cliente.get(f"{self._enlace('relaciones_personas_persona')}".format(id=id))
+        respuesta.raise_for_status()
+        return [
+            PersonaElemento(
+                _id=persona.get('personaId').get('_id'),
+                nombre=persona.get('personaId').get('nombre'),
+                apellido=persona.get('personaId').get('apellido'),
+                relaciones=persona.get('relaciones', {})
+            )
+            for persona in respuesta.json()
+        ]

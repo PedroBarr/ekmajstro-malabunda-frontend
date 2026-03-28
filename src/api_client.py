@@ -16,6 +16,7 @@ import httpx
 from consts import api_url, api_tiempo_espera, etiquetas
 
 from models.persona import Persona, PersonaElemento
+from models.arbol_relaciones import ArbolRelaciones
 
 # Enlaces de la API para diferentes recursos
 enlaces = {
@@ -24,6 +25,8 @@ enlaces = {
     'persona': lambda api: f'{api}/personas/{{id}}',
     'config_tipos_relacion': lambda api: f'{api}/tipos_relacion/config',
     'relaciones_conteo_persona': lambda api: f'{api}/relaciones/persona/{{id}}/conteo',
+    'relaciones_personas_persona': lambda api: f'{api}/relaciones/personas/{{id}}',
+    'relaciones_arbol_persona': lambda api: f'{api}/relaciones/persona/{{id}}/arbol',
 }
 
 class ClienteAPI:
@@ -160,3 +163,32 @@ class ClienteAPI:
             )
             for persona in respuesta.json()
         ]
+
+    @envolver_peticion
+    async def relaciones_arbol_persona(self, cliente: httpx.AsyncClient, persona: Persona):
+        respuesta = await cliente.get(f"{self._enlace('relaciones_arbol_persona')}".format(id=persona.id))
+        respuesta.raise_for_status()
+        relaciones = {}
+
+        for relacion in respuesta.json():
+            if relacion == "fechas": continue
+            
+            relaciones[relacion] = [
+                {
+                    'persona': Persona(
+                        _id=relacion_persona.get('personaId').get('_id'),
+                        nombre=relacion_persona.get('personaId').get('nombre'),
+                        apellido=relacion_persona.get('personaId').get('apellido'),
+                        metadatos=relacion_persona.get('personaId').get('metadata', {}),
+                    ),
+                    'fecha': relacion_persona.get('fecha', None),
+                    'nombre': relacion_persona.get('nombreRelacion', ""),
+                }
+                for relacion_persona in respuesta.json()[relacion]
+            ]
+        
+        return ArbolRelaciones(
+            persona=persona,
+            relaciones=relaciones,
+            fechas=respuesta.json().get('fechas', [])
+        )

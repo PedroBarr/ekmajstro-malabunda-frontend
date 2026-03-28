@@ -19,9 +19,11 @@ from utils import rutas
 from api_client import ClienteAPI
 
 from models.persona import Persona, PersonaElemento
+from models.arbol_relaciones import ArbolRelaciones
 
 from components.carta_persona import CartaPersona
 from components.fila_lista import fila_lista
+from components.arbol_persona import ArbolPersona
 from components.caja_mensaje import caja_cargando, caja_error, caja_mensaje
 from components.conmutador import Conmutador
 
@@ -46,6 +48,7 @@ class PersonaVista:
         self.persona: Persona = Persona.sintetizar()
         self.relaciones_contadores = {}
         self._personas: list[PersonaElemento] = []
+        self._arbol: ArbolRelaciones = None
 
         self.conmutador_principal = Conmutador(
             [
@@ -79,9 +82,7 @@ class PersonaVista:
                 lambda: caja_mensaje(
                     mensaje="No hay relaciones para mostrar (Lista).",
                 ),
-                lambda: caja_mensaje(
-                    mensaje="No hay relaciones para mostrar (Árbol).",
-                ),
+                self._arbol_componente,
                 lambda: caja_mensaje(
                     mensaje="No hay relaciones para mostrar (Red).",
                 ),
@@ -91,6 +92,7 @@ class PersonaVista:
                 "Árbol",
                 "Red",
             ],
+            inicio=1,
             al_cambio=lambda _: self._actualizar_conmutador_relaciones(),
         )
 
@@ -161,6 +163,13 @@ class PersonaVista:
                 ).add_done_callback(
                     lambda fut: self._actualizar_personas(fut.result())
                 )
+
+                asyncio.create_task(
+                    ClienteAPI().relaciones_arbol_persona(self.persona)
+                ).add_done_callback(
+                    lambda fut: self._actualizar_arbol(fut.result())
+                )
+
             except Exception as e: self.persona = None
 
         self._actualizar_carta()
@@ -283,10 +292,23 @@ class PersonaVista:
                 spacing=10,
             )
         )
+    
+    def _arbol_componente(self):
+        return (
+            caja_mensaje(
+                mensaje="No hay relaciones para mostrar.",
+            )
+            if not self._arbol
+            else ArbolPersona(arbol=self._arbol).construir()
+        )
 
     def _actualizar_personas(self, personas: list[PersonaElemento]):
         self._personas = personas
         self._actualizar_conmutador_principal()
+
+    def _actualizar_arbol(self, arbol: ArbolRelaciones):
+        self._arbol = arbol
+        self._actualizar_conmutador_relaciones()
     
     def _actualizar_conmutador_principal(self):
         self._envoltura_conmutador_principal.content = \

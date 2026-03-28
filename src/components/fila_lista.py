@@ -21,7 +21,7 @@ from models.persona import PersonaElemento
 from models import colores_tipo_relacion
 
 # Función: Crear una fila de lista con información de una persona
-def fila_lista(persona: PersonaElemento, on_click: callable):
+def fila_lista(persona: PersonaElemento, on_click: callable = lambda p: None) -> ft.Container:
     return ft.Container(
         content=ft.Row(
             [

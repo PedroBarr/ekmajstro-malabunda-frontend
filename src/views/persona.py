@@ -44,6 +44,14 @@ class PersonaVista:
         self.persona: Persona = Persona.sintetizar()
         self.relaciones_contadores = {}
         
+        self._envoltura_conmutador_principal = ft.Container(
+            expand=1,
+        )
+
+        self._envoltura_conmutador_relaciones = ft.Container(
+            expand=1,
+        )
+        
         self._actualizar_persona()
         self.construir(es_creacion=es_creacion)
 
@@ -120,12 +128,11 @@ class PersonaVista:
 
             # Si no tiene ID, es una creación
             else:
-                self.vista.controls = [
+                self.vista.controls[0] = \
                     caja_cargando(
                         etiquetas["LOADING_SYNC"],
                         size=20,
                     )
-                ]
                 self.pagina.update()
 
                 # Simular espera para que se renderize el cargador
@@ -162,38 +169,45 @@ class PersonaVista:
 
     # Función: Obtener render por detalle (formulario de persona)    
     def _controles(self):
-        return ft.Row(
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[
-                CartaPersona(
-                    persona=self.persona,
-                    relaciones=self.relaciones_contadores,
-                    al_cambio=lambda p: \
-                        asyncio.create_task(self._modificar_persona(p)),
-                    editable=True,
-                    expand=1,
-                    elevation=5,
+        return [
+            ft.Container(
+                content=ft.Row(
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    vertical_alignment=ft.CrossAxisAlignment.START,
+                    controls=[
+                        CartaPersona(
+                            persona=self.persona,
+                            relaciones=self.relaciones_contadores,
+                            al_cambio=lambda p: \
+                                asyncio.create_task(self._modificar_persona(p)),
+                            editable=True,
+                            expand=1,
+                            elevation=5,
+                        ),
+                        self._envoltura_conmutador_principal,
+                    ],
                 ),
-                ft.Container(expand=1),
-            ]
-        )
+            ),
+            self._envoltura_conmutador_relaciones,
+        ]
     
     # Función: Obtener render por error al cargar detalle
     def _carta_fallida(self):
-        return caja_error(
-            etiquetas["ERROR_LOADING_DETAIL"],
-            size=20,
-        )
+        return [
+            caja_error(
+                etiquetas["ERROR_LOADING_DETAIL"],
+                size=20,
+            )
+        ]
     
     # Función: Actualizar render
     def _actualizar_carta(self):
-        self.vista.controls = [
+        self.vista.controls = \
             self._controles() if self.persona else self._carta_fallida()
-        ]
 
     # Función: Construir la vista con ruta dinámica
     def construir(self, es_creacion=False):
         self.vista = ft.View(
             route=ruta if not es_creacion else ruta_creacion,
-            controls=[self._controles()],
+            controls=self._controles(),
         )

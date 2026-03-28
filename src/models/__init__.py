@@ -31,8 +31,8 @@ def colores_tipo_relacion(persona: PersonaElemento) -> list[ft.Colors]:
         colores = [
             (
                 ft.Colors.with_opacity(
-                    int(estilo.get('opacidad'), 16) / (255 * 2),
-                    estilo.get('color')
+                    int(estilo.get('opacidad'), 16) / (255),
+                    estilo.get('borde')
                 ) or
                 ft.Colors.TRANSPARENT
             )
@@ -40,6 +40,6 @@ def colores_tipo_relacion(persona: PersonaElemento) -> list[ft.Colors]:
             if tipo in persona.relaciones.keys()
         ]
     
-    colores.extend([ft.Colors.TRANSPARENT] * (len(colores) or 1))
+    colores.extend([ft.Colors.TRANSPARENT])
     
     return colores

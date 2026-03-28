@@ -21,7 +21,8 @@ from api_client import ClienteAPI
 from models.persona import Persona
 
 from components.carta_persona import CartaPersona
-from components.caja_mensaje import caja_cargando, caja_error
+from components.caja_mensaje import caja_cargando, caja_error, caja_mensaje
+from components.conmutador import Conmutador
 
 ruta = rutas[etiquetas["DETAIL"]](":id")
 ruta_creacion = rutas[etiquetas["DETAIL"]](None)
@@ -43,13 +44,57 @@ class PersonaVista:
 
         self.persona: Persona = Persona.sintetizar()
         self.relaciones_contadores = {}
-        
+
+        self.conmutador_principal = Conmutador(
+            [
+                ft.Icons.PERSON_4_ROUNDED,
+                ft.Icons.STYLE_ROUNDED,
+            ],
+            [
+                self._personas_componente,
+                self._contexto_componente,
+            ],
+            etiquetas=[
+                "Personas",
+                "Contexto",
+            ],
+            altura_forzada=180,
+            al_cambio=lambda _: self._actualizar_conmutador_principal(),
+        )
+
         self._envoltura_conmutador_principal = ft.Container(
             expand=1,
+            content=self.conmutador_principal.construir(),
+        )
+
+        self.conmutador_relaciones = Conmutador(
+            [
+                ft.Icons.TRANSFORM,
+                ft.Icons.KEYBOARD_OPTION_KEY_ROUNDED,
+                ft.Icons.CONTROL_CAMERA,
+            ],
+            [
+                lambda: caja_mensaje(
+                    mensaje="No hay relaciones para mostrar (Lista).",
+                ),
+                lambda: caja_mensaje(
+                    mensaje="No hay relaciones para mostrar (Árbol).",
+                ),
+                lambda: caja_mensaje(
+                    mensaje="No hay relaciones para mostrar (Red).",
+                ),
+            ],
+            etiquetas=[
+                "Lista",
+                "Árbol",
+                "Red",
+            ],
+            al_cambio=lambda _: self._actualizar_conmutador_relaciones(),
         )
 
         self._envoltura_conmutador_relaciones = ft.Container(
             expand=1,
+            content=self.conmutador_relaciones.construir(),
         )
         
         self._actualizar_persona()
@@ -211,3 +256,21 @@ class PersonaVista:
             route=ruta if not es_creacion else ruta_creacion,
             controls=self._controles(),
         )
+
+    def _personas_componente(self):
+        return caja_mensaje(
+                mensaje="No hay personas relacionadas.",
+            )
+    
+    def _actualizar_conmutador_principal(self):
+        self._envoltura_conmutador_principal.content = \
+            self.conmutador_principal.construir()
+    
+    def _contexto_componente(self):
+        return caja_mensaje(
+            mensaje="No hay contexto disponible.",
+        )
+    
+    def _actualizar_conmutador_relaciones(self):
+        self._envoltura_conmutador_relaciones.content = \
+            self.conmutador_relaciones.construir()

@@ -373,12 +373,19 @@ class Grafo3D(ft.Container):
         self.dibujar()
 
     def _al_rodar_mouse(self, evento: ft.ScrollEvent):
-        if evento.scroll_delta.y > 0:
-            self._escala *= 1.1
-        elif evento.scroll_delta.y < 0:
-            self._escala *= 0.9
+        pre_escala = self._escala
+        escala = self._escala
 
-        self.dibujar()
+        if evento.scroll_delta.y > 0:
+            escala *= 1.05
+        elif evento.scroll_delta.y < 0:
+            escala *= 0.995
+        
+        escala = max(50, min(escala, 500))
+
+        if abs(escala - pre_escala) > 1:
+            self._escala = escala
+            self.dibujar()
 
     def _al_apretar_largo(self, _: ft.ControlEventHandler):
         self._escala = self._escala_inicial

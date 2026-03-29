@@ -63,7 +63,7 @@ class Grafo3D(ft.Container):
         self._canvas = fc.Canvas(
             width=self._dimensiones[0],
             height=self._dimensiones[1],
-            on_resize=lambda e: self._actualizar_dimensiones(e.control.width, e.control.height)
+            on_resize=lambda e: self._actualizar_dimensiones(e.control.width, e.control.height),
         )
         self._centro = (self._dimensiones[0] / 2, self._dimensiones[1] / 2)
 
@@ -143,6 +143,9 @@ class Grafo3D(ft.Container):
 
     def _posicionar_nodos(self):
         self._posiciones = {}
+        
+        if self._conteo_tipos_relaciones == 0: return
+        
         delta_phi = math.pi / (self._conteo_tipos_relaciones)
 
         for i, tipo in enumerate(self._contador_tipos_relaciones):
@@ -416,14 +419,15 @@ class Grafo3D(ft.Container):
 
     def construir(self):
         if (
-            not self._personas or
-            not self._relaciones or
-            not self._nodos or
-            len(self._nodos.keys()) == 0 or
-            not self._lazos or
-            len(self._lazos) == 0
+            not self._personas
         ):
-            return ft.Container()
+            return ft.Container(
+                ft.Text(
+                    "No se encontraron nodos para mostrar.",
+                    expand=True,
+                    text_align=ft.TextAlign.CENTER,
+                ),
+            )
         
         return ft.Stack(
             controls=[
@@ -436,5 +440,5 @@ class Grafo3D(ft.Container):
                     on_pan_update=self._al_actualizar_dimensiones,
                 ),
                 self._bocadillo,
-            ]
+            ],
         )

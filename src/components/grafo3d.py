@@ -1,6 +1,7 @@
 import flet as ft
 import flet.canvas as fc
 
+import asyncio
 import math
 import random as rd
 from typing import Dict, List
@@ -83,6 +84,15 @@ class Grafo3D(ft.Container):
         self._calcular_nodos()
         self._calcular_zona_acercamiento()
 
+        self._bocadillo = ft.Container(
+            content=ft.Text("", color=ft.Colors.WHITE, size=12),
+            bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.BLACK),
+            border_radius=8,
+            padding=10,
+            visible=False,
+            animate_position=150, # Suaviza el movimiento
+        )
+
     def _calcular_nodos(self):
         personas = {}
         for persona in self._personas:
@@ -129,6 +139,7 @@ class Grafo3D(ft.Container):
         self._conteo_tipos_relaciones = len(self._contador_tipos_relaciones.keys())
 
         self._posicionar_nodos()
+        self._colisiones = {}
 
     def _posicionar_nodos(self):
         self._posiciones = {}
@@ -224,7 +235,7 @@ class Grafo3D(ft.Container):
     def dibujar_nodo(self, nodo: Nodo):
         proyeccion = self._proyectar(nodo.x, nodo.y, nodo.z, incluir_z_ord=True)
 
-        self._instrucciones_representacion.append({
+        representacion = {
             'tipo': 'nodo',
             'z_ord': proyeccion[2] if len(proyeccion) > 2 else 0,
             'representacion': fc.Circle(
@@ -233,8 +244,26 @@ class Grafo3D(ft.Container):
                 radius=nodo.s,
                 paint=ft.Paint(color=nodo.c)
             )
-        })
-    
+        }
+        
+        self._instrucciones_representacion.append(representacion)
+
+        self._agregar_colision_nodo(representacion, nodo)
+
+    def _agregar_colision_nodo(self, representacion, nodo):
+        colision = {
+            'nodo': nodo,
+            'representacion': representacion
+        }
+
+        tope = representacion['representacion'].y - representacion['representacion'].radius
+        bajo = representacion['representacion'].y + representacion['representacion'].radius
+        diestra = representacion['representacion'].x + representacion['representacion'].radius
+        siniestra = representacion['representacion'].x - representacion['representacion'].radius
+
+        caja_colision = ':'.join([str(punto) for punto in [tope, bajo, diestra, siniestra]])
+        self._colisiones[caja_colision] = colision
+
     def _asignar_posicion_nodo(
         self,
         nodo: Nodo,
@@ -256,7 +285,7 @@ class Grafo3D(ft.Container):
         proyeccion_nodo = self._proyectar(nodo.x, nodo.y, nodo.z)
         proyeccion_conectado = self._proyectar(nodo_conectado.x, nodo_conectado.y, nodo_conectado.z, incluir_z_ord=True)
 
-        self._instrucciones_representacion.append({
+        representacion = {
             'tipo': 'lazo',
             'z_ord': proyeccion_conectado[2] if len(proyeccion_conectado) > 2 else 0,
             'representacion': fc.Line(
@@ -266,7 +295,9 @@ class Grafo3D(ft.Container):
                 y2=proyeccion_conectado[1],
                 paint=ft.Paint(color=lazo.c, stroke_width=2)
             )
-        })
+        }
+
+        self._instrucciones_representacion.append(representacion)
 
         self.dibujar_nodo(nodo_conectado)
 
@@ -274,6 +305,8 @@ class Grafo3D(ft.Container):
 
     def _dibujar_red(self):
         self._instrucciones_representacion = []
+        self._colisiones = {}
+        
         contador_tipos_relaciones = {
             tipo: 0
             for tipo in self._contador_tipos_relaciones.keys()
@@ -334,11 +367,51 @@ class Grafo3D(ft.Container):
 
         self.dibujar()
 
-    def _al_apretar_largo(self, evento: ft.ControlEventHandler):
+    def _al_apretar_largo(self, _: ft.ControlEventHandler):
         self._escala = self._escala_inicial
         self._angulo_acimut = self._angulo_acimut_inicial
         self._angulo_elevacion = self._angulo_elevacion_inicial
         
+        self.dibujar()
+
+    def _al_doble_clic(self, evento: ft.TapEvent):
+        x = evento.local_position.x
+        y = evento.local_position.y
+
+        for caja_colision, colision in self._colisiones.items():
+            tope, bajo, diestra, siniestra = map(float, caja_colision.split(':'))
+            if siniestra <= x <= diestra and tope <= y <= bajo:
+                nodo = colision['nodo']
+
+                info = nodo.i
+                texto_info = info.get('nombre', '') + ' ' + info.get('apellido', '')
+                
+                if texto_info.strip() == '':
+                    texto_info = 'Información no disponible'
+
+                self._bocadillo.content.value = texto_info
+                self._bocadillo.x = 10
+                self._bocadillo.y = 10
+                self._bocadillo.visible = True
+
+                asyncio.create_task(self._ocultar_bocadillo_temporalmente())
+                
+                break
+            else:
+                self._bocadillo.visible = False
+
+    async def _ocultar_bocadillo_temporalmente(self):
+        await asyncio.sleep(2)
+        self._bocadillo.visible = False
+        self._al_repintar()
+
+    def _al_actualizar_dimensiones(self, evento: ft.DragUpdateEvent):
+        delta_x = evento.local_delta.x
+        delta_y = evento.local_delta.y
+
+        self._angulo_acimut += delta_x * 0.5
+        self._angulo_elevacion += delta_y * 0.5
+
         self.dibujar()
 
     def construir(self):
@@ -352,9 +425,16 @@ class Grafo3D(ft.Container):
         ):
             return ft.Container()
         
-        return ft.GestureDetector(
-            content=self._canvas,
-            on_tap=self._al_clic,
-            on_scroll=self._al_rodar_mouse,
-            on_long_press=self._al_apretar_largo,
+        return ft.Stack(
+            controls=[
+                ft.GestureDetector(
+                    content=self._canvas,
+                    on_tap=self._al_clic,
+                    on_scroll=self._al_rodar_mouse,
+                    on_long_press=self._al_apretar_largo,
+                    on_double_tap_down=self._al_doble_clic,
+                    on_pan_update=self._al_actualizar_dimensiones,
+                ),
+                self._bocadillo,
+            ]
         )

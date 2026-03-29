@@ -4,6 +4,7 @@ import flet.canvas as fc
 import asyncio
 import math
 import random as rd
+import time
 from typing import Dict, List
 
 from themes import estilos_config
@@ -80,6 +81,8 @@ class Grafo3D(ft.Container):
         self._lazos = []
 
         self._al_repintar = al_repintar
+        self._ultimo_dibujo = 0
+        self._ms_entre_dibujos = 1000
 
         self._calcular_nodos()
         self._calcular_zona_acercamiento()
@@ -326,7 +329,13 @@ class Grafo3D(ft.Container):
             self._canvas.shapes.append(instruccion['representacion'])
 
     def dibujar(self):
+        ahora = time.time() * 1000
+        
+        if ahora - self._ultimo_dibujo < self._ms_entre_dibujos: return
+        
+        self._ultimo_dibujo = ahora
         self._canvas.shapes.clear()
+        
         self._dibujar_ejes()
         self._dibujar_red()
         self._al_repintar()

@@ -83,6 +83,7 @@ class Grafo3D(ft.Container):
         self._al_repintar = al_repintar
         self._ultimo_dibujo = 0
         self._ms_entre_dibujos = 1000
+        self._ultimo_bocadillo = 0
 
         self._calcular_nodos()
         self._calcular_zona_acercamiento()
@@ -406,11 +407,11 @@ class Grafo3D(ft.Container):
                 self._bocadillo.y = 10
                 self._bocadillo.visible = True
 
+                self._ultimo_bocadillo = time.time()
+
                 asyncio.create_task(self._ocultar_bocadillo_temporalmente())
                 
                 break
-            else:
-                self._bocadillo.visible = False
     
     async def _pre_doble_clic(self, evento: ft.TapEvent):
         await ft.BrowserContextMenu().disable()
@@ -424,8 +425,9 @@ class Grafo3D(ft.Container):
 
     async def _ocultar_bocadillo_temporalmente(self):
         await asyncio.sleep(2)
-        self._bocadillo.visible = False
-        self._al_repintar()
+        if time.time() - self._ultimo_bocadillo >= 2:
+            self._bocadillo.visible = False
+            self._al_repintar()
 
     def _al_actualizar_dimensiones(self, evento: ft.DragUpdateEvent):
         delta_x = evento.local_delta.x

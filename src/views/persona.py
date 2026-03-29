@@ -53,6 +53,8 @@ class PersonaVista:
         self._arbol: ArbolRelaciones = None
         self._grafo3d: Dict[str, List] = None
 
+        self._altura_conmutador_principal = 180
+
         self.conmutador_principal = Conmutador(
             [
                 ft.Icons.PERSON_4_ROUNDED,
@@ -66,8 +68,9 @@ class PersonaVista:
                 "Personas",
                 "Contexto",
             ],
-            altura_forzada=180,
+            altura_forzada=self._altura_conmutador_principal,
             al_cambio=lambda _: self._actualizar_conmutador_principal(),
+            inicio=1,
         )
 
         self._envoltura_conmutador_principal = ft.Container(

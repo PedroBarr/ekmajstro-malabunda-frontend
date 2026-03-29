@@ -13,6 +13,7 @@
 import flet as ft
 import asyncio
 import re
+from typing import Dict, List
 
 from consts import etiquetas
 from utils import rutas
@@ -24,6 +25,7 @@ from models.arbol_relaciones import ArbolRelaciones
 from components.carta_persona import CartaPersona
 from components.fila_lista import fila_lista
 from components.arbol_persona import ArbolPersona
+from components.grafo3d import Grafo3D
 from components.caja_mensaje import caja_cargando, caja_error, caja_mensaje
 from components.conmutador import Conmutador
 
@@ -49,6 +51,7 @@ class PersonaVista:
         self.relaciones_contadores = {}
         self._personas: list[PersonaElemento] = []
         self._arbol: ArbolRelaciones = None
+        self._grafo3d: Dict[str, List] = None
 
         self.conmutador_principal = Conmutador(
             [
@@ -83,9 +86,7 @@ class PersonaVista:
                     mensaje="No hay relaciones para mostrar (Lista).",
                 ),
                 self._arbol_componente,
-                lambda: caja_mensaje(
-                    mensaje="No hay relaciones para mostrar (Red).",
-                ),
+                self._grafo3d_componente,
             ],
             etiquetas=[
                 "Lista",
@@ -168,6 +169,12 @@ class PersonaVista:
                     ClienteAPI().relaciones_arbol_persona(self.persona)
                 ).add_done_callback(
                     lambda fut: self._actualizar_arbol(fut.result())
+                )
+
+                asyncio.create_task(
+                    ClienteAPI().relaciones_grafo_persona(self.persona)
+                ).add_done_callback(
+                    lambda fut: self._actualizar_grafo(fut.result())
                 )
 
             except Exception as e: self.persona = None
@@ -301,6 +308,24 @@ class PersonaVista:
             if not self._arbol
             else ArbolPersona(arbol=self._arbol).construir()
         )
+    
+    def _grafo3d_componente(self):
+        return (
+            caja_mensaje(
+                mensaje="No hay relaciones para mostrar.",
+            )
+            if not self._grafo3d else
+            Grafo3D(
+                grafo=self._grafo3d,
+                dimensiones_iniciales=(
+                    self.pagina.width,
+                    self.pagina.height - self._altura_conmutador_principal
+                ),
+                angulo_elevacion_inicial=75,
+                al_repintar=lambda: self.pagina.update()
+            )\
+                .construir()
+        )
 
     def _actualizar_personas(self, personas: list[PersonaElemento]):
         self._personas = personas
@@ -308,6 +333,10 @@ class PersonaVista:
 
     def _actualizar_arbol(self, arbol: ArbolRelaciones):
         self._arbol = arbol
+        self._actualizar_conmutador_relaciones()
+
+    def _actualizar_grafo(self, grafo: Dict[str, List]):
+        self._grafo3d = grafo
         self._actualizar_conmutador_relaciones()
     
     def _actualizar_conmutador_principal(self):

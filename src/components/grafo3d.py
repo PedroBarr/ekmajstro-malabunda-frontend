@@ -430,13 +430,13 @@ class Grafo3D(ft.Container):
             self._al_repintar()
 
     def _al_actualizar_dimensiones(self, evento: ft.DragUpdateEvent):
-        delta_x = evento.local_delta.x
-        delta_y = evento.local_delta.y
+        sensibilidad = 0.2
+        
+        delta_x = evento.local_delta.x * sensibilidad
+        delta_y = evento.local_delta.y * sensibilidad
 
-        self._angulo_acimut += delta_x * 0.5
-        self._angulo_elevacion += delta_y * 0.5
-
-        self.dibujar()
+        self._angulo_acimut += delta_x
+        self._angulo_elevacion += delta_y
 
     def construir(self):
         if (
@@ -459,6 +459,7 @@ class Grafo3D(ft.Container):
                     on_long_press=self._al_apretar_largo,
                     on_double_tap_down=self._al_doble_clic,
                     on_pan_update=self._al_actualizar_dimensiones,
+                    on_pan_end=lambda e: self.dibujar(),
                     on_secondary_tap=self._al_clic_derecho,
                     on_secondary_tap_down=self._pre_doble_clic,
                     on_secondary_tap_up=self._pos_clic_derecho,

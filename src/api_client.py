@@ -27,6 +27,7 @@ enlaces = {
     'relaciones_conteo_persona': lambda api: f'{api}/relaciones/persona/{{id}}/conteo',
     'relaciones_personas_persona': lambda api: f'{api}/relaciones/personas/{{id}}',
     'relaciones_arbol_persona': lambda api: f'{api}/relaciones/persona/{{id}}/arbol',
+    'relaciones_grafo_persona': lambda api: f'{api}/relaciones/persona/{{id}}/grafico3d',
 }
 
 class ClienteAPI:
@@ -192,3 +193,9 @@ class ClienteAPI:
             relaciones=relaciones,
             fechas=respuesta.json().get('fechas', [])
         )
+    
+    @envolver_peticion
+    async def relaciones_grafo_persona(self, cliente: httpx.AsyncClient, persona: Persona):
+        respuesta = await cliente.get(f"{self._enlace('relaciones_grafo_persona')}".format(id=persona.id))
+        respuesta.raise_for_status()
+        return respuesta.json()

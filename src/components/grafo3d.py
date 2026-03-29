@@ -402,6 +402,16 @@ class Grafo3D(ft.Container):
                 break
             else:
                 self._bocadillo.visible = False
+    
+    async def _pre_doble_clic(self, evento: ft.TapEvent):
+        await ft.BrowserContextMenu().disable()
+    
+    def _al_clic_derecho(self, evento: ft.ControlEventHandler):
+        self._escala *= 0.8
+        self.dibujar()
+
+    async def _pos_clic_derecho(self, evento: ft.ControlEventHandler):
+        await ft.BrowserContextMenu().enable()
 
     async def _ocultar_bocadillo_temporalmente(self):
         await asyncio.sleep(2)
@@ -438,6 +448,9 @@ class Grafo3D(ft.Container):
                     on_long_press=self._al_apretar_largo,
                     on_double_tap_down=self._al_doble_clic,
                     on_pan_update=self._al_actualizar_dimensiones,
+                    on_secondary_tap=self._al_clic_derecho,
+                    on_secondary_tap_down=self._pre_doble_clic,
+                    on_secondary_tap_up=self._pos_clic_derecho,
                 ),
                 self._bocadillo,
             ],

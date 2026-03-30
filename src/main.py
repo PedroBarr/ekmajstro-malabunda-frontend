@@ -16,7 +16,12 @@ import flet as ft
 from consts import etiquetas, configuracion
 from api_client import ClienteAPI
 from router import Enrutador
-from themes import tema_modo, tema_ekmajstro, estilos_config
+from themes import (
+    tema_modo,
+    tema_ekmajstro,
+    estilos_config,
+    recursos_config,
+)
 
 from components.BFA_principal import BotonFlotanteAccionPrincipal
 from views.bienvenida import elemento_bienvenida
@@ -59,6 +64,23 @@ async def cargar_configuracion(pagina: ft.Page):
             configuracion.update({
                 'tipos_relacion': config['tipos_relacion']['tipos'],
             })
+
+    if config.get('nacionalidades'):
+        nacionalidades = {}
+        for nacion in config['nacionalidades'].get('opciones', []):
+            nacionalidades[nacion] = {
+                'nombre': nacion,
+                'emoticon': config['nacionalidades']\
+                    .get('emoticones', {}).get(nacion, '🌍')
+            }
+
+        configuracion.update({
+            'nacionalidades': nacionalidades.keys(),
+        })
+
+        recursos_config.update({
+            'nacionalidades': nacionalidades,
+        })
 
     pagina.update()
 

@@ -53,3 +53,4 @@ def tema_ekmajstro() -> ft.Theme:
 tema_modo = ft.ThemeMode.DARK
 
 estilos_config = {}
+recursos_config = {}

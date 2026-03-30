@@ -13,6 +13,7 @@
 
 import flet as ft
 from typing import Dict
+from datetime import datetime
 
 from models.persona import Persona
 from consts import configuracion
@@ -181,7 +182,39 @@ class CartaPersona(ft.Card):
                 [
                     ft.Row(
                         controls=[
-                            ft.Container(expand=3),
+                            ft.Container(expand=2),
+                            ft.Column(
+                                [
+                                    ft.Text(
+                                        (
+                                            datetime.fromisoformat(self.persona.ultimo_periodo['fecha_inicio'].replace("Z", "+00:00")).strftime("%Y-%m-%d")
+                                            if 'fecha_inicio' in self.persona.ultimo_periodo and type(self.persona.ultimo_periodo['fecha_inicio']) is str
+                                            else ""
+                                        ) + " / " +
+                                        (
+                                            datetime.fromisoformat(self.persona.ultimo_periodo['fecha_fin'].replace("Z", "+00:00")).strftime("%Y-%m-%d")
+                                            if 'fecha_fin' in self.persona.ultimo_periodo and type(self.persona.ultimo_periodo['fecha_fin']) is str
+                                            else "Actualidad"
+                                        ),
+                                        size=16,
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.Colors.WHITE,
+                                    ),
+                                    ft.Text(
+                                        (
+                                            self.persona.ultimo_periodo['estado']
+                                            if 'estado' in self.persona.ultimo_periodo
+                                            else "Sin información de periodo"
+                                        ),
+                                        size=12,
+                                        color=ft.Colors.GREY_400,
+                                    ),
+                                ],
+                                spacing=0,
+                                expand=1,
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                horizontal_alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            ),
                             contador_relaciones(
                                 self.relaciones
                             ),

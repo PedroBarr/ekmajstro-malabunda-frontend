@@ -15,6 +15,8 @@ import flet as ft
 from typing import Dict
 
 from models.persona import Persona
+from consts import configuracion
+from themes import recursos_config
 
 from components.campo_editable import CampoEditable
 from components.contador_relaciones import contador_relaciones
@@ -49,6 +51,37 @@ class CartaPersona(ft.Card):
     def _modificar_persona(self, cambios: dict):
         self.persona.modificar(cambios)
         self.al_cambio(self.persona)
+
+    def _linea_nacionalidades(self):
+        texto_base = lambda texto: ft.Text(
+            texto,
+            size=20,
+            opacity=0.7,
+        )
+
+        return ft.Row(
+            spacing=5,
+            expand=1,
+            controls=(
+                [
+                    texto_base(
+                        recursos_config['nacionalidades']['desconocida']['emoticon'],
+                    )
+                ] if not self.persona.nacionalidades
+                else [
+                    (
+                        texto_base(
+                            (recursos_config['nacionalidades'].get(nacion) or {}).get('emoticon', '❓'),
+                        )
+                        if nacion in configuracion.get('nacionalidades', [])
+                        else texto_base(
+                            recursos_config['nacionalidades']['desconocida']['otro'],
+                        )
+                    )
+                    for nacion in self.persona.nacionalidades
+                ]
+            ),
+        )
     
     # Función: Obtener render de información de cabecera
     def _info_cabecera(self):
@@ -86,6 +119,7 @@ class CartaPersona(ft.Card):
                             ),
                         ],
                     ),
+                    self._linea_nacionalidades(),
                 ],
             ),
         )

@@ -13,7 +13,7 @@
 import flet as ft
 
 from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 
 class Persona(BaseModel):
@@ -26,6 +26,11 @@ class Persona(BaseModel):
     id: Optional[str] = Field(..., alias="_id")
     nombre: Optional[str] = ""
     apellido: str
+    
+    eventos: Optional[List[Dict[str, Any]]] = Field(default_factory=list, exclude=True)
+    ultimo_periodo: Optional[Dict[str, Any]] = Field(default_factory=dict, exclude=True)
+    nacionalidades: Optional[List[str]] = Field(default_factory=list, exclude=True)
+
     metadatos: Optional[Dict[str, Any]] = \
         Field(default_factory=dict, alias="metadata")
     

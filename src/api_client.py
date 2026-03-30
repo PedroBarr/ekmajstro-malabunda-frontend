@@ -24,6 +24,7 @@ enlaces = {
     'personas': lambda api: f'{api}/personas',
     'persona': lambda api: f'{api}/personas/{{id}}',
     'config_tipos_relacion': lambda api: f'{api}/tipos_relacion/config',
+    'config_eventos': lambda api: f'{api}/eventos/config',
     'relaciones_conteo_persona': lambda api: f'{api}/relaciones/persona/{{id}}/conteo',
     'relaciones_personas_persona': lambda api: f'{api}/relaciones/personas/{{id}}',
     'relaciones_arbol_persona': lambda api: f'{api}/relaciones/persona/{{id}}/arbol',
@@ -94,13 +95,26 @@ class ClienteAPI:
         estilos_tipos_relacion = config_tipos_relacion.get('estilo', {})
         tipos_relacion = config_tipos_relacion.get('tipos', [])
         cantidad_tipos_relacion = config_tipos_relacion.get('cantidad', len(tipos_relacion))
-        
+
+        # Eventos
+        respuesta = await cliente.get(self._enlace('config_eventos'))
+        respuesta.raise_for_status()
+        config_eventos = respuesta.json()
+        nacionalidades = config_eventos.get('nacionalidades', [])
+        cantidad_nacionalidades = config_eventos.get('cantidad', len(nacionalidades))
+        emoticones_nacionalidades = config_eventos.get('emoticones', {})
+
         return {
             'nombre': nombre,
             'tipos_relacion': {
                 'estilos': estilos_tipos_relacion,
                 'tipos': tipos_relacion,
                 'cantidad': cantidad_tipos_relacion,
+            },
+            'nacionalidades': {
+                'opciones': nacionalidades,
+                'cantidad': cantidad_nacionalidades,
+                'emoticones': emoticones_nacionalidades
             }
         }
 

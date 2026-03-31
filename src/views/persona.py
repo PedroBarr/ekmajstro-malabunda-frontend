@@ -230,6 +230,22 @@ class PersonaVista:
                     await self.pagina.push_route(ruta_nueva)
 
         except Exception as e: self.persona = None
+    
+    async def _al_evento(self, evento: ft.Event, tipo: str):
+        opciones = {
+        }
+
+        if tipo in opciones:
+            opciones[tipo]()
+        else:
+            dialogo = self.alerta_componente(
+                contenido=ft.Text(
+                    f"Incapaz de manejar evento '{tipo}'.",
+                    size=16,
+                    weight=ft.FontWeight.BOLD,
+                )
+            )
+            self.pagina.show_dialog(dialogo)
         
     # Función asíncrona: Modificar la persona y sincronizar cambios
     async def _modificar_persona(self, persona: Persona):
@@ -383,3 +399,27 @@ class PersonaVista:
     def _actualizar_conmutador_relaciones(self):
         self._envoltura_conmutador_relaciones.content = \
             self.conmutador_relaciones.construir()
+        
+    def alerta_componente(
+        self,
+        contenido: str,
+    ):
+        return ft.AlertDialog(
+            content=contenido,
+            alignment=ft.Alignment.CENTER,
+            actions=[
+                ft.Button(
+                    ft.Text(
+                        "Cerrar",
+                        size=14,
+                        weight=ft.FontWeight.BOLD,
+                    ),
+                    on_click=lambda e: self.pagina.pop_dialog(),
+                    style=ft.ButtonStyle(
+                        color=ft.Colors.WHITE,
+                        bgcolor=ft.Colors.PRIMARY,
+                        padding=ft.Padding(25, 10, 25, 10),
+                    ),
+                )
+            ],
+        )

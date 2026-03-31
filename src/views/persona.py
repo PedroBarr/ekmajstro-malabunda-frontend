@@ -14,8 +14,9 @@ import flet as ft
 import asyncio
 import re
 from typing import Dict, List
+from datetime import datetime
 
-from consts import etiquetas
+from consts import etiquetas, configuracion
 from utils import rutas
 from api_client import ClienteAPI
 
@@ -230,9 +231,156 @@ class PersonaVista:
                     await self.pagina.push_route(ruta_nueva)
 
         except Exception as e: self.persona = None
+
+    async def _preprocesar_evento_a_agregar(self, evento: dict):
+        if self.persona and self.persona.id:
+            evento["personaId"] = self.persona.id
+            
+            if evento.get("fecha_fin") is None:
+                del evento["fecha_fin"]
+            
+            try:
+                await ClienteAPI().crear_evento_persona(evento=evento)
+            except Exception as e:
+                print(f"Error al crear el evento: {e}")
+            finally:
+                await self.cargar_datos()
+
+        return True
+    
+    def _abrir_modal_agregar_evento(self):
+        nombre_evento = ft.TextField(
+            label="Nombre del evento",
+            autofocus=True,
+            expand=True,
+        )
+
+        hoy = datetime.now()
+        fechas_evento = [hoy.strftime("%Y-%m-%d"), hoy.strftime("%Y-%m-%d")]
+
+        fecha_inicio_evento_selector = ft.DatePicker(
+            last_date=datetime(hoy.year + 1, 12, 31),
+            on_change=lambda e: (
+                fechas_evento.__setitem__(0, e.control.value.strftime("%Y-%m-%d")),
+                setattr(fecha_inicio_evento_boton.content, "value", fechas_evento[0]),
+            ),
+        )
+
+        fecha_inicio_evento_boton = ft.Button(
+            content=ft.Text(fechas_evento[0]),
+            on_click=lambda e: self.pagina.show_dialog(fecha_inicio_evento_selector),
+            bgcolor=ft.Colors.PRIMARY,
+            color=ft.Colors.WHITE,
+            expand=True,
+        )
+
+        fecha_fin_evento_selector = ft.DatePicker(
+            last_date=datetime(hoy.year + 1, 12, 31),
+            on_change=lambda e: (
+                fechas_evento.__setitem__(1, e.control.value.strftime("%Y-%m-%d")),
+                setattr(fecha_fin_evento_boton.content, "value", fechas_evento[1]),
+            ),
+        )
+
+        fecha_fin_evento_boton = ft.Button(
+            content=ft.Text(fechas_evento[1]),
+            on_click=lambda e: self.pagina.show_dialog(fecha_fin_evento_selector),
+            bgcolor=ft.Colors.PRIMARY,
+            color=ft.Colors.WHITE,
+            expand=True,
+        )
+
+        incluir_fecha_fin = ft.Checkbox(
+            label="Incluir fecha de fin",
+            on_change=lambda _: setattr(fecha_fin_evento_boton, "visible", incluir_fecha_fin.value),
+        )
+
+        incluir_fecha_fin.value = False
+        incluir_fecha_fin.on_change(None)
+
+        nacionalidad_evento = ft.Dropdown(
+            options=[
+                ft.DropdownOption(key=nac, text=nac)
+                for nac in configuracion["nacionalidades"]
+            ],
+            expand=True,
+        )
+
+        descripcion_evento = ft.TextField(
+            label="Descripción del evento",
+            multiline=True,
+            expand=True,
+            min_lines=2,
+            max_lines=5,
+        )
+
+        confirmar_evento = lambda _: (
+            asyncio.create_task(self._preprocesar_evento_a_agregar({
+                "nombre": nombre_evento.value,
+                "fecha_inicio": fechas_evento[0],
+                "fecha_fin": fechas_evento[1] if incluir_fecha_fin.value else None,
+                "nacionalidad": nacionalidad_evento.value,
+                "descripcion": descripcion_evento.value,
+            })).add_done_callback(
+                lambda fut: self.pagina.pop_dialog() if fut.result() else None
+            )
+        )
+
+        modal = ft.AlertDialog(
+            title=ft.Text("Agregar un nuevo evento"),
+            content=ft.Container(
+                content=ft.Column(
+                    [
+                        nombre_evento,
+                        ft.Row(
+                            [
+                                fecha_inicio_evento_boton,
+                                fecha_fin_evento_boton,
+                            ],
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                        ),
+                        ft.Row(
+                            [
+                                incluir_fecha_fin,
+                            ],
+                            alignment=ft.MainAxisAlignment.END,
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                        ),
+                        nacionalidad_evento,
+                        descripcion_evento,
+                    ],
+                    spacing=10,
+                ),
+                height=250,
+            ),
+            actions=[
+                ft.Button(
+                    "Cancelar",
+                    on_click=lambda e: self.pagina.pop_dialog(),
+                    style=ft.ButtonStyle(
+                        color=ft.Colors.WHITE,
+                        bgcolor=ft.Colors.GREY_600,
+                        padding=ft.Padding(25, 10, 25, 10),
+                    ),
+                ),
+                ft.Button(
+                    "Confirmar",
+                    on_click=confirmar_evento,
+                    style=ft.ButtonStyle(
+                        color=ft.Colors.WHITE,
+                        bgcolor=ft.Colors.PRIMARY,
+                        padding=ft.Padding(25, 10, 25, 10),
+                    ),
+                ),
+            ],
+        )
+
+        self.pagina.show_dialog(modal)
     
     async def _al_evento(self, evento: ft.Event, tipo: str):
         opciones = {
+            'agregar_evento': self._abrir_modal_agregar_evento,
         }
 
         if tipo in opciones:

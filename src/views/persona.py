@@ -377,10 +377,70 @@ class PersonaVista:
         )
 
         self.pagina.show_dialog(modal)
+
+    def _ir_a_relacionar_persona(self):
+        modal = ft.AlertDialog(
+            title=ft.Text("Relacionar con otra persona"),
+            content=ft.Text("Funcionalidad en desarrollo."),
+            actions=[
+                ft.Button(
+                    "Cerrar",
+                    on_click=lambda e: self.pagina.pop_dialog(),
+                    style=ft.ButtonStyle(
+                        color=ft.Colors.WHITE,
+                        bgcolor=ft.Colors.PRIMARY,
+                        padding=ft.Padding(25, 10, 25, 10),
+                    ),
+                )
+            ],
+        )
+
+        self.pagina.show_dialog(modal)
+
+    def _ver_articulo_relacionado(self):
+        modal = ft.AlertDialog(
+            title=ft.Text("Ver artículo relacionado"),
+            content=ft.Text("Funcionalidad en desarrollo."),
+            actions=[
+                ft.Button(
+                    "Cerrar",
+                    on_click=lambda e: self.pagina.pop_dialog(),
+                    style=ft.ButtonStyle(
+                        color=ft.Colors.WHITE,
+                        bgcolor=ft.Colors.PRIMARY,
+                        padding=ft.Padding(25, 10, 25, 10),
+                    ),
+                )
+            ],
+        )
+
+        self.pagina.show_dialog(modal)
+
+    def _reportar_error(self):
+        modal = ft.AlertDialog(
+            title=ft.Text("Reportar un error"),
+            content=ft.Text("Se necesita iniciar sesión."),
+            actions=[
+                ft.Button(
+                    "Cerrar",
+                    on_click=lambda e: self.pagina.pop_dialog(),
+                    style=ft.ButtonStyle(
+                        color=ft.Colors.WHITE,
+                        bgcolor=ft.Colors.PRIMARY,
+                        padding=ft.Padding(25, 10, 25, 10),
+                    ),
+                )
+            ],
+        )
+
+        self.pagina.show_dialog(modal)
     
     async def _al_evento(self, evento: ft.Event, tipo: str):
         opciones = {
             'agregar_evento': self._abrir_modal_agregar_evento,
+            'agregar_relacion': self._ir_a_relacionar_persona,
+            'ver_articulo': self._ver_articulo_relacionado,
+            'reportar_error': self._reportar_error,
         }
 
         if tipo in opciones:

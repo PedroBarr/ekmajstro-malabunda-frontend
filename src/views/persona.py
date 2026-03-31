@@ -24,6 +24,7 @@ from models.arbol_relaciones import ArbolRelaciones
 
 from components.carta_persona import CartaPersona
 from components.fila_lista import fila_lista
+from components.resumen_evento import resumen_evento
 from components.arbol_persona import ArbolPersona
 from components.grafo3d import Grafo3D
 from components.caja_mensaje import caja_cargando, caja_error, caja_mensaje
@@ -49,6 +50,8 @@ class PersonaVista:
 
         self.persona: Persona = Persona.sintetizar()
         self.relaciones_contadores = {}
+        self._eventos = []
+        
         self._personas: list[PersonaElemento] = []
         self._arbol: ArbolRelaciones = None
         self._grafo3d: Dict[str, List] = None
@@ -160,6 +163,12 @@ class PersonaVista:
                     ClienteAPI().relaciones_conteo_persona(self.persona.id)
                 ).add_done_callback(
                     lambda fut: self._actualizar_relaciones_conteo(fut.result())
+                )
+
+                asyncio.create_task(
+                    ClienteAPI().eventos_persona(self.persona.id)
+                ).add_done_callback(
+                    lambda fut: self._actualizar_eventos(fut.result())
                 )
 
                 asyncio.create_task(
@@ -335,6 +344,10 @@ class PersonaVista:
         self._personas = personas
         self._actualizar_conmutador_principal()
 
+    def _actualizar_eventos(self, eventos: list[Dict[str, str]]):
+        self._eventos = eventos
+        self._actualizar_conmutador_principal()
+
     def _actualizar_arbol(self, arbol: ArbolRelaciones):
         self._arbol = arbol
         self._actualizar_conmutador_relaciones()
@@ -348,8 +361,21 @@ class PersonaVista:
             self.conmutador_principal.construir()
     
     def _contexto_componente(self):
-        return caja_mensaje(
-            mensaje="No hay contexto disponible.",
+        return (
+            caja_mensaje(
+                mensaje="No hay contexto disponible.",
+            )
+            if not self._eventos or self._eventos == []
+            else ft.Column(
+                [
+                    resumen_evento(
+                        evento,
+                    )
+                    for evento in self._eventos
+                ],
+                scroll=ft.ScrollMode.AUTO,
+                spacing=10,
+            )
         )
     
     def _actualizar_conmutador_relaciones(self):

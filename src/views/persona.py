@@ -281,6 +281,7 @@ class PersonaVista:
                             editable=True,
                             expand=1,
                             elevation=5,
+                            pagina=self.pagina,
                         ),
                         self._envoltura_conmutador_principal,
                     ],

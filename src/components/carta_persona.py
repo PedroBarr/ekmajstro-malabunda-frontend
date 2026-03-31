@@ -39,11 +39,13 @@ class CartaPersona(ft.Card):
         relaciones: Dict[str, int] = {},
         editable: bool = True,
         al_evento=lambda e, tipo: None,
+        pagina:ft.Page = None,
         **param_contenedor
     ):
         super().__init__(**param_contenedor)
         self.persona = persona
         self.relaciones = relaciones
+        self._pagina = pagina
 
         self.al_cambio = al_cambio
         self._al_evento = al_evento
@@ -180,6 +182,47 @@ class CartaPersona(ft.Card):
             ),
         )
     
+    def _agregar_alias(self, alias_o_evento: str | ft.ControlEventHandler):
+        alias = (
+            alias_o_evento.value
+            if type(alias_o_evento) is ft.TextField
+            else alias_o_evento
+        )
+        
+        if type(alias) is str:
+            alias = alias.strip()
+            if alias and alias not in self.persona.alias:
+                self._modificar_persona({
+                    "alias": self.persona.alias + [alias]
+                })
+    
+    def _abrir_modal_agregar_alias(self):
+        alias_nuevo = ft.TextField(
+            label="Alias",
+            autofocus=True,
+            expand=True,
+        )
+        confirmar_evento = lambda _: (self._agregar_alias(alias_nuevo), self._pagina.pop_dialog())
+
+        modal = ft.AlertDialog(
+            title=ft.Text("Agregar un nuevo alias"),
+            content=alias_nuevo,
+            actions=[
+                ft.TextButton(
+                    "Cancelar",
+                    on_click=lambda e: self._pagina.pop_dialog(),
+                ),
+                ft.TextButton(
+                    "Agregar",
+                    on_click=confirmar_evento,
+                ),
+            ],
+        )
+
+        alias_nuevo.on_submit = confirmar_evento
+
+        self._pagina.show_dialog(modal)
+    
     def _linea_alias(self, **parametros):
         alias_base = lambda alias: ft.Container(
             content=ft.Text(
@@ -196,7 +239,7 @@ class CartaPersona(ft.Card):
 
         boton_agregar_alias = ft.Button(
             "+",
-            on_click=lambda e: asyncio.create_task(self._al_evento(e, "agregar_alias")),
+            on_click=lambda e: self._abrir_modal_agregar_alias(),
             bgcolor=ft.Colors.PRIMARY if self.persona and self.persona.id and self._es_editable else ft.Colors.GREY_600,
             color=ft.Colors.WHITE,
             disabled=not self.persona.id or not self._es_editable,

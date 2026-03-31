@@ -26,6 +26,7 @@ class Persona(BaseModel):
     id: Optional[str] = Field(..., alias="_id")
     nombre: Optional[str] = ""
     apellido: str
+    alias: Optional[List[str]] = Field(default_factory=list, exclude=True)
     
     eventos: Optional[List[Dict[str, Any]]] = Field(default_factory=list, exclude=True)
     ultimo_periodo: Optional[Dict[str, Any]] = Field(default_factory=dict, exclude=True)

@@ -208,6 +208,28 @@ class Grafo3D(ft.Container):
         yc = ft.Colors.with_opacity(opacidad, ft.Colors.GREEN)
         zc = ft.Colors.with_opacity(opacidad, ft.Colors.BLUE)
 
+        eje_x1 = self._proyectar(limite_eje // 4, limite_eje, 0)
+        eje_nx1 = self._proyectar(limite_eje // 4, -limite_eje, 0)
+        eje_xn1 = self._proyectar(-limite_eje // 4, limite_eje, 0)
+        eje_nxn1 = self._proyectar(-limite_eje // 4, -limite_eje, 0)
+        
+        eje_y1 = self._proyectar(limite_eje, limite_eje // 4, 0)
+        eje_ny1 = self._proyectar(-limite_eje, limite_eje // 4, 0)
+        eje_yn1 = self._proyectar(limite_eje, -limite_eje // 4, 0)
+        eje_nyn1 = self._proyectar(-limite_eje, -limite_eje // 4, 0)
+
+        eje_x2 = self._proyectar(limite_eje // 2, limite_eje, 0)
+        eje_nx2 = self._proyectar(limite_eje // 2, -limite_eje, 0)
+        eje_xn2 = self._proyectar(-limite_eje // 2, limite_eje, 0)
+        eje_nxn2 = self._proyectar(-limite_eje // 2, -limite_eje, 0)
+
+        eje_y2 = self._proyectar(limite_eje, limite_eje // 2, 0)
+        eje_ny2 = self._proyectar(-limite_eje, limite_eje // 2, 0)
+        eje_yn2 = self._proyectar(limite_eje, -limite_eje // 2, 0)
+        eje_nyn2 = self._proyectar(-limite_eje, -limite_eje // 2, 0)
+
+        c = ft.Colors.with_opacity(opacidad - 0.1, ft.Colors.WHITE)
+
         ejes = [
             fc.Line(
                 *origen,
@@ -238,7 +260,47 @@ class Grafo3D(ft.Container):
                 *origen,
                 *eje_nz,
                 paint=ft.Paint(color=zc, stroke_width=2, stroke_dash_pattern=[4, 2])
-            )
+            ),
+            fc.Line(
+                *eje_x1,
+                *eje_nx1,
+                paint=ft.Paint(color=c, stroke_width=1, stroke_dash_pattern=[2, 2])
+            ),
+            fc.Line(
+                *eje_xn1,
+                *eje_nxn1,
+                paint=ft.Paint(color=c, stroke_width=1, stroke_dash_pattern=[2, 2])
+            ),
+            fc.Line(
+                *eje_y1,
+                *eje_ny1,
+                paint=ft.Paint(color=c, stroke_width=1, stroke_dash_pattern=[2, 2])
+            ),
+            fc.Line(
+                *eje_yn1,
+                *eje_nyn1,
+                paint=ft.Paint(color=c, stroke_width=1, stroke_dash_pattern=[2, 2])
+            ),
+            fc.Line(
+                *eje_x2,
+                *eje_nx2,
+                paint=ft.Paint(color=c, stroke_width=1, stroke_dash_pattern=[2, 2])
+            ),
+            fc.Line(
+                *eje_xn2,
+                *eje_nxn2,
+                paint=ft.Paint(color=c, stroke_width=1, stroke_dash_pattern=[2, 2])
+            ),
+            fc.Line(
+                *eje_y2,
+                *eje_ny2,
+                paint=ft.Paint(color=c, stroke_width=1, stroke_dash_pattern=[2, 2])
+            ),
+            fc.Line(
+                *eje_yn2,
+                *eje_nyn2,
+                paint=ft.Paint(color=c, stroke_width=1, stroke_dash_pattern=[2, 2])
+            ),
         ]
 
         self._canvas.shapes.extend(ejes)

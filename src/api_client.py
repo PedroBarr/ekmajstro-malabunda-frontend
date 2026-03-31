@@ -30,6 +30,7 @@ enlaces = {
     'relaciones_arbol_persona': lambda api: f'{api}/relaciones/persona/{{id}}/arbol',
     'relaciones_grafo_persona': lambda api: f'{api}/relaciones/persona/{{id}}/grafico3d',
     'eventos_persona': lambda api: f'{api}/eventos/persona/{{id}}',
+    'crear_evento_persona': lambda api: f'{api}/eventos',
 }
 
 class ClienteAPI:
@@ -218,5 +219,11 @@ class ClienteAPI:
     @envolver_peticion
     async def eventos_persona(self, cliente: httpx.AsyncClient, id: str):
         respuesta = await cliente.get(f"{self._enlace('eventos_persona')}".format(id=id))
+        respuesta.raise_for_status()
+        return respuesta.json()
+    
+    @envolver_peticion
+    async def crear_evento_persona(self, cliente: httpx.AsyncClient, evento: dict):
+        respuesta = await cliente.post(self._enlace('crear_evento_persona'),json=evento)
         respuesta.raise_for_status()
         return respuesta.json()

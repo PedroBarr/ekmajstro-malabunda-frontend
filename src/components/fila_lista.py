@@ -21,7 +21,11 @@ from models.persona import PersonaElemento
 from models import colores_tipo_relacion
 
 # Función: Crear una fila de lista con información de una persona
-def fila_lista(persona: PersonaElemento, on_click: callable = lambda p: None) -> ft.Container:
+def fila_lista(
+    persona: PersonaElemento,
+    on_click: callable = lambda p: None,
+    compacta: bool = False,
+) -> ft.Container:
     return ft.Container(
         content=ft.Row(
             [
@@ -45,13 +49,13 @@ def fila_lista(persona: PersonaElemento, on_click: callable = lambda p: None) ->
                 ),
                 ft.Container(expand=True),
                 ft.Container(
-                    content=contador_relaciones(persona.relaciones),
+                    content=contador_relaciones(persona.relaciones, compacta=compacta),
                 ),
                 ft.Container(width=20),
             ],
         ),
         on_click=lambda _: on_click(persona),
-        padding=10,
+        padding=10 if not compacta else ft.Padding.symmetric(vertical=2, horizontal=10),
         border_radius=25,
         gradient=ft.LinearGradient(
             begin=ft.Alignment.BOTTOM_RIGHT,

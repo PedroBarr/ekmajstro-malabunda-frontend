@@ -3,7 +3,10 @@ import flet as ft
 from themes import estilos_config
 from consts import configuracion
 
-def contador_relaciones(relaciones: dict[str, int]) -> ft.Control:
+def contador_relaciones(
+    relaciones: dict[str, int],
+    compacta: bool = False,
+) -> ft.Control:
 
     def linea(relacion: str, cantidad: int) -> ft.Control:
         return ft.Row(
@@ -11,7 +14,7 @@ def contador_relaciones(relaciones: dict[str, int]) -> ft.Control:
                 ft.Container(
                     align=ft.Alignment.CENTER,
                     width=30,
-                    height=3,
+                    height=3 if not compacta else 2,
                     bgcolor=estilos_config
                         .get('tipos_relacion', {})
                         .get(relacion, {})
@@ -21,11 +24,11 @@ def contador_relaciones(relaciones: dict[str, int]) -> ft.Control:
                 ft.Text(
                     str(cantidad),
                     color=ft.Colors.GREY_400,
-                    size=12,
+                    size=12 if not compacta else 10,
                     weight=ft.FontWeight.W_900,
                 ),
             ],
-             spacing=2,
+            spacing=2 if not compacta else 0,
         )
 
     return ft.Row(

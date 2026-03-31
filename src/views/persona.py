@@ -53,7 +53,7 @@ class PersonaVista:
         self._arbol: ArbolRelaciones = None
         self._grafo3d: Dict[str, List] = None
 
-        self._altura_conmutador_principal = 180
+        self._altura_conmutador_principal = 230
 
         self.conmutador_principal = Conmutador(
             [
@@ -200,7 +200,7 @@ class PersonaVista:
 
             # Si no tiene ID, es una creación
             else:
-                self.vista.controls[0] = \
+                self.vista.controls = \
                     caja_cargando(
                         etiquetas["LOADING_SYNC"],
                         size=20,
@@ -294,7 +294,8 @@ class PersonaVista:
                 [
                     fila_lista(
                         persona,
-                        lambda p: asyncio.create_task(self.pagina.push_route(rutas[etiquetas["DETAIL"]](p.id)))
+                        lambda p: asyncio.create_task(self.pagina.push_route(rutas[etiquetas["DETAIL"]](p.id))),
+                        compacta=True,
                     )
                     for persona in self._personas
                 ],

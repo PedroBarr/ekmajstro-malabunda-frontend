@@ -194,6 +194,17 @@ class CartaPersona(ft.Card):
             border_radius=ft.BorderRadius.all(15),
         )
 
+        boton_agregar_alias = ft.Button(
+            "+",
+            on_click=lambda e: asyncio.create_task(self._al_evento(e, "agregar_alias")),
+            bgcolor=ft.Colors.PRIMARY if self.persona and self.persona.id and self._es_editable else ft.Colors.GREY_600,
+            color=ft.Colors.WHITE,
+            disabled=not self.persona.id or not self._es_editable,
+            width=60,
+            height=25,
+            align=ft.Alignment.CENTER,
+        )
+
         return ft.Row(
             spacing=5,
             controls=[
@@ -210,6 +221,7 @@ class CartaPersona(ft.Card):
                         for alias in self.persona.alias
                     ],
                 ),
+                boton_agregar_alias,
             ],
             scroll="hidden",
             **parametros,

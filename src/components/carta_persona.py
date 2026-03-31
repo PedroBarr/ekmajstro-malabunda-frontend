@@ -255,7 +255,37 @@ class CartaPersona(ft.Card):
                     ),
                     ft.Row(
                         controls=[
-                            ft.Container(expand=2),
+                            ft.Column(
+                                [
+                                    ft.Row(
+                                        controls=[
+                                            ft.Button(
+                                                "Ver artículo",
+                                                on_click=lambda e: asyncio.create_task(self._al_evento(e, "ver_articulo")),
+                                                bgcolor=ft.Colors.GREY_600,
+                                                color=ft.Colors.WHITE,
+                                                disabled=True,
+                                                expand=1,
+                                            ),
+                                        ],
+                                    ),
+                                    ft.Row(
+                                        controls=[
+                                            ft.Button(
+                                                "Reportar error",
+                                                on_click=lambda e: asyncio.create_task(self._al_evento(e, "reportar_error")),
+                                                bgcolor=ft.Colors.DEEP_PURPLE_200 if self.persona and self.persona.id else ft.Colors.GREY_600,
+                                                color=ft.Colors.WHITE,
+                                                disabled=not self.persona or not self.persona.id,
+                                                expand=1,
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                                spacing=10,
+                                horizontal_alignment=ft.MainAxisAlignment.CENTER,
+                                expand=2,
+                            ),
                             ft.Column(
                                 [
                                     ft.Text(

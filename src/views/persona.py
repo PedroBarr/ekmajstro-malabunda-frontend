@@ -332,7 +332,7 @@ class PersonaVista:
                 grafo=self._grafo3d,
                 dimensiones_iniciales=(
                     self.pagina.width,
-                    self.pagina.height - self._altura_conmutador_principal
+                    self.pagina.height - self._altura_conmutador_principal - 50
                 ),
                 angulo_elevacion_inicial=75,
                 al_repintar=lambda: self.pagina.update()

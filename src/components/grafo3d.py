@@ -93,6 +93,7 @@ class Grafo3D(ft.Container):
             bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.BLACK),
             border_radius=8,
             padding=10,
+            margin=10,
             visible=False,
             animate_position=150, # Suaviza el movimiento
         )
@@ -366,9 +367,9 @@ class Grafo3D(ft.Container):
                 self._angulo_acimut += 15
             
             if evento.local_position.y < self._zona_acercamiento[1][0]:
-                self._angulo_elevacion += 15
-            elif evento.local_position.y > self._zona_acercamiento[1][1]:
                 self._angulo_elevacion -= 15
+            elif evento.local_position.y > self._zona_acercamiento[1][1]:
+                self._angulo_elevacion += 15
 
         self.dibujar()
 
@@ -445,6 +446,121 @@ class Grafo3D(ft.Container):
         self._angulo_acimut += delta_x
         self._angulo_elevacion += delta_y
 
+    def _controles(self):
+        base_boton = lambda icono, al_clic: ft.Container(
+            width=30,
+            height=30,
+            bgcolor=ft.Colors.GREY_800,
+            border_radius=10,
+            content=ft.IconButton(
+                icon=ft.Icon(
+                    icono if type(icono).__name__ in ['str', 'Icons'] else ft.Icons.CIRCLE,
+                    color=ft.Colors.GREY_300,
+                    size=12,
+                ),
+                on_click=al_clic,
+            ),
+            border=ft.Border.all(1, ft.Colors.GREY_500),
+        )
+
+        base_espacio = lambda: ft.Container(width=30, height=30)
+
+        return ft.Container(
+            content=ft.Row(
+                controls=[
+                    ft.Column(
+                        controls=[
+                            base_espacio(),
+                            base_boton(
+                                ft.Icons.ARROW_LEFT_ROUNDED,
+                                lambda e: self._al_clic(
+                                    ft.TapEvent(
+                                        local_position=ft.Offset(0, self._centro[1]),
+                                        name="arrow_left",
+                                        control=e.control
+                                    )
+                                ),
+                            ),
+                            base_espacio(),
+                            base_espacio(),
+                            base_espacio(),
+                            base_espacio(),
+                        ],
+                        spacing=5,
+                    ),
+                    ft.Column(
+                        controls=[
+                            base_boton(
+                                ft.Icons.ARROW_DROP_UP_ROUNDED,
+                                lambda e: self._al_clic(
+                                    ft.TapEvent(
+                                        local_position=ft.Offset(self._centro[0], 0),
+                                        name="arrow_up",
+                                        control=e.control
+                                    )
+                                ),
+                            ),
+                            base_boton(
+                                ft.Icons.CENTER_FOCUS_STRONG_ROUNDED,
+                                lambda e: self._al_apretar_largo(e)
+                            ),
+                            base_boton(
+                                ft.Icons.ARROW_DROP_DOWN_ROUNDED,
+                                lambda e: self._al_clic(
+                                    ft.TapEvent(
+                                        local_position=ft.Offset(self._centro[0], self._dimensiones[1]),
+                                        name="arrow_down",
+                                        control=e.control
+                                    )
+                                ),
+                            ),
+                            base_espacio(),
+                            base_boton(
+                                ft.Icons.ADD_ROUNDED,
+                                lambda e: self._al_clic(
+                                    ft.TapEvent(
+                                        local_position=ft.Offset(self._centro[0], self._centro[1]),
+                                        name="add",
+                                        control=e.control
+                                    )
+                                ),
+                            ),
+                            base_boton(
+                                ft.Icons.REMOVE_ROUNDED,
+                                lambda e: self._al_clic_derecho(e),
+                            ),
+                        ],
+                        spacing=5,
+                    ),
+                    ft.Column(
+                        controls=[
+                            base_espacio(),
+                            base_boton(
+                                ft.Icons.ARROW_RIGHT_ROUNDED,
+                                lambda e: self._al_clic(
+                                    ft.TapEvent(
+                                        local_position=ft.Offset(self._dimensiones[0], self._centro[1]),
+                                        name="arrow_right",
+                                        control=e.control
+                                    )
+                                ),
+                            ),
+                            base_espacio(),
+                            base_espacio(),
+                            base_espacio(),
+                            base_espacio(),
+                        ],
+                        spacing=5,
+                    ),
+                ],
+                spacing=5,
+                wrap=True,
+            ),
+            padding=10,
+            margin=10,
+            align=ft.Alignment.TOP_RIGHT,
+        )
+
     def construir(self):
         if (
             not self._personas
@@ -460,7 +576,10 @@ class Grafo3D(ft.Container):
         return ft.Stack(
             controls=[
                 ft.GestureDetector(
-                    content=self._canvas,
+                    content=ft.Container(
+                        self._canvas,
+                        bgcolor=ft.Colors.with_opacity(0.25, ft.Colors.BLACK)
+                    ),
                     on_tap=self._al_clic,
                     on_scroll=self._al_rodar_mouse,
                     on_long_press=self._al_apretar_largo,
@@ -472,5 +591,6 @@ class Grafo3D(ft.Container):
                     on_secondary_tap_up=self._pos_clic_derecho,
                 ),
                 self._bocadillo,
+                self._controles(),
             ],
         )

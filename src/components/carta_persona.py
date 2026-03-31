@@ -14,6 +14,7 @@
 import flet as ft
 from typing import Dict
 from datetime import datetime
+import asyncio
 
 from models.persona import Persona
 from consts import configuracion
@@ -37,12 +38,15 @@ class CartaPersona(ft.Card):
         al_cambio: callable,
         relaciones: Dict[str, int] = {},
         editable: bool = True,
+        al_evento=lambda e, tipo: None,
         **param_contenedor
     ):
         super().__init__(**param_contenedor)
         self.persona = persona
-        self.al_cambio = al_cambio
         self.relaciones = relaciones
+
+        self.al_cambio = al_cambio
+        self._al_evento = al_evento
 
         self._es_editable = editable
 

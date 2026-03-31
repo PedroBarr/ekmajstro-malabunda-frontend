@@ -277,6 +277,7 @@ class PersonaVista:
                             relaciones=self.relaciones_contadores,
                             al_cambio=lambda p: \
                                 asyncio.create_task(self._modificar_persona(p)),
+                            al_evento=self._al_evento,
                             editable=True,
                             expand=1,
                             elevation=5,

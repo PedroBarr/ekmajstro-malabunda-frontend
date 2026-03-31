@@ -53,6 +53,7 @@ class Grafo3D(ft.Container):
         angulo_acimut_inicial: float = 45,
         angulo_elevacion_inicial: float = 30,
         al_repintar=lambda: None,
+        al_ver_detalles=lambda _: None,
         **parametros
     ):
         super().__init__(**parametros)
@@ -81,6 +82,8 @@ class Grafo3D(ft.Container):
         self._lazos = []
 
         self._al_repintar = al_repintar
+        self._al_ver_detalles = al_ver_detalles
+
         self._ultimo_dibujo = 0
         self._ms_entre_dibujos = 1000
         self._ultimo_bocadillo = 0
@@ -89,7 +92,7 @@ class Grafo3D(ft.Container):
         self._calcular_zona_acercamiento()
 
         self._bocadillo = ft.Container(
-            content=ft.Text("", color=ft.Colors.WHITE, size=12),
+            content=ft.Container(),
             bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.BLACK),
             border_radius=8,
             padding=10,
@@ -399,27 +402,26 @@ class Grafo3D(ft.Container):
         x = evento.local_position.x
         y = evento.local_position.y
 
+        colisiono = False
+
         for caja_colision, colision in self._colisiones.items():
             tope, bajo, diestra, siniestra = map(float, caja_colision.split(':'))
             if siniestra <= x <= diestra and tope <= y <= bajo:
                 nodo = colision['nodo']
 
                 info = nodo.i
-                texto_info = info.get('nombre', '') + ' ' + info.get('apellido', '')
-                
-                if texto_info.strip() == '':
-                    texto_info = 'Información no disponible'
 
-                self._bocadillo.content.value = texto_info
+                self._bocadillo.content = self._construir_bocadillo_info(nodo, info)
                 self._bocadillo.x = 10
                 self._bocadillo.y = 10
                 self._bocadillo.visible = True
 
                 self._ultimo_bocadillo = time.time()
-
-                asyncio.create_task(self._ocultar_bocadillo_temporalmente())
-                
+                colisiono = True
                 break
+
+        if not colisiono:
+            asyncio.create_task(self._ocultar_bocadillo_temporalmente(esperar=0))
     
     async def _pre_doble_clic(self, evento: ft.TapEvent):
         await ft.BrowserContextMenu().disable()
@@ -431,10 +433,47 @@ class Grafo3D(ft.Container):
     async def _pos_clic_derecho(self, evento: ft.ControlEventHandler):
         await ft.BrowserContextMenu().enable()
 
-    async def _ocultar_bocadillo_temporalmente(self):
-        await asyncio.sleep(2)
-        if time.time() - self._ultimo_bocadillo >= 2:
+    def _construir_bocadillo_info(self, nodo: Nodo, info: Dict):
+        return ft.Column(
+            controls=[
+                ft.Text(
+                    nodo.i.get('apellido', '') + (f", {nodo.i.get('nombre', '')}" if nodo.i.get('nombre', '') else ""),
+                    color=ft.Colors.WHITE,
+                    size=18,
+                    weight=ft.FontWeight.BOLD
+                ),
+                ft.Text(f"ID: {nodo.id}", color=ft.Colors.WHITE_70, size=12),
+                ft.Row(
+                    controls=[
+                        ft.Container(
+                            width=self._dimensiones[0] // 8,
+                        ),
+                        ft.Button(
+                            "Ver detalles",
+                            on_click=lambda e: self._al_ver_detalles(info.get('_id', None)),
+                            bgcolor=ft.Colors.PRIMARY,
+                            color=ft.Colors.WHITE,
+                        ),
+                        ft.Button(
+                            "Cancelar",
+                            on_click=self._cerrar_bocadillo,
+                            bgcolor=ft.Colors.GREY_700,
+                            color=ft.Colors.WHITE,
+                        )
+                    ]
+                ),
+            ],
+            spacing=5,
+        )
+    
+    async def _cerrar_bocadillo(self, _):
+        await self._ocultar_bocadillo_temporalmente(esperar=0)
+
+    async def _ocultar_bocadillo_temporalmente(self, esperar=2):
+        await asyncio.sleep(esperar)
+        if time.time() - self._ultimo_bocadillo >= esperar:
             self._bocadillo.visible = False
+            self._bocadillo.content = ft.Container()
             self._al_repintar()
 
     def _al_actualizar_dimensiones(self, evento: ft.DragUpdateEvent):
@@ -578,7 +617,10 @@ class Grafo3D(ft.Container):
                 ft.GestureDetector(
                     content=ft.Container(
                         self._canvas,
-                        bgcolor=ft.Colors.with_opacity(0.25, ft.Colors.BLACK)
+                        bgcolor=ft.Colors.with_opacity(
+                            0.25,
+                            ft.Colors.BLACK
+                        ),
                     ),
                     on_tap=self._al_clic,
                     on_scroll=self._al_rodar_mouse,
@@ -590,7 +632,7 @@ class Grafo3D(ft.Container):
                     on_secondary_tap_down=self._pre_doble_clic,
                     on_secondary_tap_up=self._pos_clic_derecho,
                 ),
-                self._bocadillo,
                 self._controles(),
+                self._bocadillo,
             ],
         )

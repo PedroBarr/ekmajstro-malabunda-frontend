@@ -335,7 +335,9 @@ class PersonaVista:
                     self.pagina.height - self._altura_conmutador_principal - 50
                 ),
                 angulo_elevacion_inicial=75,
-                al_repintar=lambda: self.pagina.update()
+                al_repintar=lambda: self.pagina.update(),
+                al_ver_detalles=lambda id: \
+                    asyncio.create_task(self.pagina.push_route(rutas[etiquetas["DETAIL"]](id))),
             )\
                 .construir()
         )

@@ -176,10 +176,52 @@ class CartaPersona(ft.Card):
             ),
         )
     
+    def _linea_alias(self, **parametros):
+        alias_base = lambda alias: ft.Container(
+            content=ft.Text(
+                alias,
+                size=12,
+                color=ft.Colors.WHITE,
+                weight=ft.FontWeight.BOLD,
+            ),
+            bgcolor=ft.Colors.PRIMARY,
+            padding=ft.Padding.symmetric(horizontal=12, vertical=3),
+            height=25,
+            border_radius=ft.BorderRadius.all(15),
+        )
+
+        return ft.Row(
+            spacing=5,
+            controls=[
+                ft.Text(
+                    "Alias: ",
+                    size=16,
+                    weight=ft.FontWeight.BOLD,
+                    color=ft.Colors.WHITE,
+                ),
+                ft.Row(
+                    spacing=5,
+                    controls=[
+                        alias_base(alias=alias)
+                        for alias in self.persona.alias
+                    ],
+                ),
+            ],
+            scroll="hidden",
+            **parametros,
+        )
+    
     def _cuerpo(self):
         return ft.Container(
             content=ft.Column(
                 [
+                    ft.Row(
+                        controls=[
+                            self._linea_alias(expand=2),
+                            ft.Container(expand=2),
+                        ],
+                        alignment=ft.MainAxisAlignment.END,
+                    ),
                     ft.Row(
                         controls=[
                             ft.Container(expand=2),

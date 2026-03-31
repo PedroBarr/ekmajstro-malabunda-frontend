@@ -234,7 +234,22 @@ class CartaPersona(ft.Card):
                     ft.Row(
                         controls=[
                             self._linea_alias(expand=2),
-                            ft.Container(expand=2),
+                            ft.Button(
+                                "Agregar evento",
+                                on_click=lambda e: asyncio.create_task(self._al_evento(e, "agregar_evento")),
+                                bgcolor=ft.Colors.PRIMARY if self.persona and self.persona.id else ft.Colors.GREY_600,
+                                color=ft.Colors.WHITE,
+                                disabled=not self.persona or not self.persona.id,
+                                expand=1,
+                            ),
+                            ft.Button(
+                                "Agregar relación",
+                                on_click=lambda e: asyncio.create_task(self._al_evento(e, "agregar_relacion")),
+                                bgcolor=ft.Colors.PRIMARY if self.persona and self.persona.id else ft.Colors.GREY_600,
+                                color=ft.Colors.WHITE,
+                                disabled=not self.persona or not self.persona.id,
+                                expand=1,
+                            )
                         ],
                         alignment=ft.MainAxisAlignment.END,
                     ),

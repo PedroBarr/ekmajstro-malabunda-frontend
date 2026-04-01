@@ -22,6 +22,7 @@ class Grafo3D(ft.Container):
             c: ft.Colors = ft.Colors.BLUE, # color del nodo
             s: float = 10, # tamaño del nodo
             i: Dict = {}, # información adicional del nodo
+            b: ft.Colors = ft.Colors.WHITE, # color del borde del nodo
         ):
             self.id = id
             self.x = x
@@ -31,7 +32,8 @@ class Grafo3D(ft.Container):
             self.c = c
             self.s = s
             self.i = i
-    
+            self.b = b
+
     class Lazo:
         def __init__(
             self,
@@ -133,6 +135,7 @@ class Grafo3D(ft.Container):
                 z=0,
                 s=10,
                 c=estilos_config['tipos_relacion'].get(tipo, {}).get('color', ft.Colors.GREY),
+                b=estilos_config['tipos_relacion'].get(tipo, {}).get('borde', ft.Colors.GREY),
                 i=persona_conectada.get('personaId', {})
             )
             lazo = self.Lazo(
@@ -316,6 +319,12 @@ class Grafo3D(ft.Container):
                 y=proyeccion[1],
                 radius=nodo.s,
                 paint=ft.Paint(color=nodo.c)
+            ),
+            'borde': fc.Circle(
+                x=proyeccion[0],
+                y=proyeccion[1],
+                radius=nodo.s + 2,
+                paint=ft.Paint(color=nodo.b, stroke_width=3, style=ft.PaintingStyle.STROKE)
             )
         }
         
@@ -394,6 +403,17 @@ class Grafo3D(ft.Container):
         
         for instruccion in self._instrucciones_representacion:
             self._canvas.shapes.append(instruccion['representacion'])
+
+            if instruccion['tipo'] == 'nodo':
+                representacion_borde_interno = fc.Circle(
+                    x=instruccion['representacion'].x,
+                    y=instruccion['representacion'].y,
+                    radius=instruccion['representacion'].radius + 4,
+                    paint=ft.Paint(color=ft.Colors.WHITE, stroke_width=1, style=ft.PaintingStyle.STROKE)
+                )
+
+                self._canvas.shapes.append(instruccion['borde'])
+                self._canvas.shapes.append(representacion_borde_interno)
 
     def dibujar(self):
         ahora = time.time() * 1000

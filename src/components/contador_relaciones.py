@@ -7,6 +7,7 @@ def contador_relaciones(
     relaciones: dict[str, int],
     compacta: bool = False,
 ) -> ft.Control:
+    if relaciones is None: return ft.Container(expand=True)
 
     def linea(relacion: str, cantidad: int) -> ft.Control:
         return ft.Row(

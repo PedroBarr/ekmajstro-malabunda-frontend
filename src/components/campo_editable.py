@@ -28,6 +28,9 @@ class CampoEditable(ft.Container):
             valor: str,
             al_cambio: callable,
             editable: bool = True,
+            tipo: str = "texto", # Puede ser "texto", "lista" o "multilinea"
+            opciones: list = [],
+            color_etiqueta: ft.Colors = ft.Colors.OUTLINE_VARIANT,
             **param_contenedor
         ):
         super().__init__(**param_contenedor)
@@ -36,12 +39,17 @@ class CampoEditable(ft.Container):
         self.valor = valor
         self.al_cambio = al_cambio
 
+        self.tipo = tipo
+        self.opciones = opciones
+
+        self.color_etiqueta = color_etiqueta
+
         # Variables internas
         self._es_editando = False
         self._es_editable = editable
 
         # Inicialización
-        self.expand = True
+        self.expand = param_contenedor.get("expand", True)
 
         self._calc_ini()
         self._contruir()
@@ -69,7 +77,7 @@ class CampoEditable(ft.Container):
 
     # Función: Validador de valor
     def _no_valor(self):
-        return not self.valor or self.valor == ""
+        return not self.valor or self.valor.strip() == ""
 
     # Función: Validador de campo
     def _hay_valor(self):
@@ -78,38 +86,77 @@ class CampoEditable(ft.Container):
     # Función: Obtener render de modo lectura
     def _modo_lectura(self):
         return ft.Container(
-            content=ft.Text(
-                self.valor if self._hay_valor() else self.etiqueta,
-                size=20,
-                color=ft.Colors.ON_SURFACE
-                    if self._hay_valor()
-                    else ft.Colors.OUTLINE_VARIANT,
+            content=
+            ft.Column(
+                controls=[
+                    ft.Text(
+                        self.valor if self._hay_valor() else self.etiqueta,
+                        size=20,
+                        color=ft.Colors.ON_SURFACE
+                            if self._hay_valor()
+                            else self.color_etiqueta,
+                    ),
+                ],
+                tight=True,
+                height=(
+                    (1.4 * 20 * (min(self.valor.count("\n"), 4) + 1))
+                    if self._hay_valor() and self.tipo == "multilinea"
+                    else None
+                ),
+                scroll="hidden",
             ),
-            expand=True,
+            expand=self.expand,
             align=ft.Alignment.CENTER_LEFT,
             on_click=self._conmutar_modo,
         )
     
     # Función: Obtener render de modo edición
     def _modo_edicion(self):
-        return ft.TextField(
-            label=self.etiqueta,
-            value=self.valor,
-            on_submit=self._guardar_cambio,
-            on_blur=self._guardar_cambio,
-            autofocus=True,
-            expand=True,
-            border=ft.InputBorder.NONE,
-            text_style=ft.TextStyle(
-                size=16,
-                color=ft.Colors.ON_SURFACE,
-            ),
-            label_style=ft.TextStyle(
-                size=12,
-                color=ft.Colors.OUTLINE,
-            ),
-            dense=True,
-        )
+        if self.tipo == "lista":
+            return ft.Dropdown(
+                options=[
+                    ft.DropdownOption(key=opcion, text=opcion)
+                    for opcion in self.opciones
+                ],
+                label=self.etiqueta,
+                value=self.valor,
+                on_select=self._guardar_cambio,
+                on_blur=self._guardar_cambio,
+                autofocus=True,
+                expand=self.expand,
+                border=ft.InputBorder.NONE,
+                text_style=ft.TextStyle(
+                    size=16,
+                    color=ft.Colors.ON_SURFACE,
+                ),
+                label_style=ft.TextStyle(
+                    size=12,
+                    color=ft.Colors.OUTLINE,
+                ),
+                dense=True,
+            )
+        else:
+            return ft.TextField(
+                label=self.etiqueta,
+                value=self.valor,
+                on_submit=self._guardar_cambio,
+                on_blur=self._guardar_cambio,
+                autofocus=True,
+                expand=True,
+                border=ft.InputBorder.NONE,
+                text_style=ft.TextStyle(
+                    size=16,
+                    color=ft.Colors.ON_SURFACE,
+                ),
+                label_style=ft.TextStyle(
+                    size=12,
+                    color=ft.Colors.OUTLINE,
+                ),
+                multiline=self.tipo == "multilinea",
+                min_lines=3 if self.tipo == "multilinea" else 1,
+                max_lines=5 if self.tipo == "multilinea" else 1,
+                dense=True,
+            )
 
     # Función: Construir render
     def _contruir(self):

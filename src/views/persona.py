@@ -385,23 +385,19 @@ class PersonaVista:
         self.pagina.show_dialog(modal)
 
     def _ir_a_relacionar_persona(self):
-        modal = ft.AlertDialog(
-            title=ft.Text("Relacionar con otra persona"),
-            content=ft.Text("Funcionalidad en desarrollo."),
-            actions=[
-                ft.Button(
-                    "Cerrar",
-                    on_click=lambda e: self.pagina.pop_dialog(),
-                    style=ft.ButtonStyle(
-                        color=ft.Colors.WHITE,
-                        bgcolor=ft.Colors.PRIMARY,
-                        padding=ft.Padding(25, 10, 25, 10),
-                    ),
+        if self.persona and self.persona.id:
+            ruta = rutas['relacion'](None)
+            ruta = f"{ruta}?personas={self.persona.id}"
+            asyncio.create_task(self.pagina.push_route(ruta))
+        else:
+            dialogo = self.alerta_componente(
+                contenido=ft.Text(
+                    "La persona debe tener un ID válido para agregar una relación.",
+                    size=16,
+                    weight=ft.FontWeight.BOLD,
                 )
-            ],
-        )
-
-        self.pagina.show_dialog(modal)
+            )
+            self.pagina.show_dialog(dialogo)
 
     def _ver_articulo_relacionado(self):
         modal = ft.AlertDialog(

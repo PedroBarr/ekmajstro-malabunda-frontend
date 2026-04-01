@@ -103,12 +103,12 @@ class RelacionVista:
                         color_etiqueta=ft.Colors.GREY_400,
                     ),
                     ft.Container(
-                        bgcolor=self.relacion.borde(),
+                        bgcolor=self.relacion.color(),
                         height=5,
                         width=(
-                            400
+                            500
                             if self.relacion.nombre.strip() == ""
-                            else min(len(self.relacion.nombre) * 15, 800)
+                            else min(max(len(self.relacion.nombre) * 11.5, 500), 1000)
                         ),
                     ),
                     ft.Row(

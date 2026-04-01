@@ -1,8 +1,10 @@
 import flet as ft
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from themes import estilos_config
+from consts import configuracion
 
 from .persona import PersonaElemento
 
@@ -45,6 +47,9 @@ class Relacion(BaseModel):
     def fecha(self) -> str:
         return self.contexto.get('fecha', '')
     
+    def relacionados_cantidad(self) -> int:
+        return len(self.relacionados)
+    
     def relacionados_personas(self) -> List[PersonaElemento]:
         return [
             (
@@ -54,3 +59,75 @@ class Relacion(BaseModel):
             )
             for relacionado in self.relacionados
         ]
+    
+    def agregar_cambios(self, cambios: Dict[str, Any]):
+        for clave, valor in cambios.items():
+            if clave in self.contexto:
+                self.contexto[clave] = valor
+            elif hasattr(self, clave):
+                setattr(self, clave, valor)
+
+    @classmethod
+    def sintetizar(
+        cls,
+        id: Optional[str] = None,
+        nombre: Optional[str] = "",
+        tipo: Optional[str] = "",
+        descripcion: Optional[str] = "",
+        fecha: Optional[str] = "",
+        dicc: Optional[Dict[str, Any]] = None,
+        relacion: Optional["Relacion"] = None,
+    ):
+        _id = (
+            id or
+            (dicc.get("id") if dicc else None) or
+            (relacion.id if relacion else None)
+        )
+
+        _nombre = (
+            nombre or
+            (dicc.get("nombre") if dicc else "") or
+            (relacion.nombre if relacion else "")
+        )
+
+        _tipo = (
+            tipo or
+            (dicc.get("tipo") if dicc else "") or
+            (relacion.tipo if relacion else "") or
+            (
+                configuracion['tipos_relacion'][0]
+                if configuracion['tipos_relacion']
+                else ""
+            )
+        )
+
+        _descripcion = (
+            descripcion or
+            (dicc.get("contexto", {}).get("descripcion") if dicc else "") or
+            (relacion.descripcion() if relacion else "")
+        )
+        
+        _fecha = (
+            fecha or
+            (dicc.get("contexto", {}).get("fecha") if dicc else "") or
+            (relacion.fecha() if relacion else "") or
+            datetime.now().strftime("%Y-%m-%d")
+        )
+
+        _contexto = (
+            (dicc.get("contexto", {}) if dicc else None) or
+            (relacion.contexto if relacion else None) or
+            {}
+        )
+
+        _contexto.update({
+            "descripcion": _descripcion,
+            "fecha": _fecha,
+        })
+
+        return cls(
+            id=_id,
+            nombre=_nombre,
+            tipo=_tipo,
+            contexto=_contexto,
+        )

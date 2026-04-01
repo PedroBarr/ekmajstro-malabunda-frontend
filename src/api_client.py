@@ -16,6 +16,7 @@ import httpx
 from consts import api_url, api_tiempo_espera, etiquetas
 
 from models.persona import Persona, PersonaElemento
+from models.relacion import Relacion
 from models.arbol_relaciones import ArbolRelaciones
 
 # Enlaces de la API para diferentes recursos
@@ -26,6 +27,7 @@ enlaces = {
     'config_tipos_relacion': lambda api: f'{api}/tipos_relacion/config',
     'config_eventos': lambda api: f'{api}/eventos/config',
     'relaciones_conteo_persona': lambda api: f'{api}/relaciones/persona/{{id}}/conteo',
+    'relaciones_persona': lambda api: f'{api}/relaciones/persona/{{id}}',
     'relaciones_personas_persona': lambda api: f'{api}/relaciones/personas/{{id}}',
     'relaciones_arbol_persona': lambda api: f'{api}/relaciones/persona/{{id}}/arbol',
     'relaciones_grafo_persona': lambda api: f'{api}/relaciones/persona/{{id}}/grafico3d',
@@ -167,6 +169,12 @@ class ClienteAPI:
         respuesta.raise_for_status()
         return respuesta.json()
     
+    @envolver_peticion
+    async def relaciones_persona(self, cliente: httpx.AsyncClient, id: str):
+        respuesta = await cliente.get(f"{self._enlace('relaciones_persona')}".format(id=id))
+        respuesta.raise_for_status()
+        return [Relacion(**relacion) for relacion in respuesta.json()]
+
     @envolver_peticion
     async def relaciones_personas_persona(self, cliente: httpx.AsyncClient, id: str):
         respuesta = await cliente.get(f"{self._enlace('relaciones_personas_persona')}".format(id=id))

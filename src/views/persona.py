@@ -26,6 +26,7 @@ from models.arbol_relaciones import ArbolRelaciones
 from components.carta_persona import CartaPersona
 from components.fila_lista import fila_lista
 from components.resumen_evento import resumen_evento
+from components.elemento_relacion import ElementoRelacion
 from components.arbol_persona import ArbolPersona
 from components.grafo3d import Grafo3D
 from components.caja_mensaje import caja_cargando, caja_error, caja_mensaje
@@ -51,8 +52,9 @@ class PersonaVista:
 
         self.persona: Persona = Persona.sintetizar()
         self.relaciones_contadores = {}
-        self._eventos = []
         
+        self._eventos: List = []
+        self._relaciones: List = []
         self._personas: list[PersonaElemento] = []
         self._arbol: ArbolRelaciones = None
         self._grafo3d: Dict[str, List] = None
@@ -89,9 +91,7 @@ class PersonaVista:
                 ft.Icons.CONTROL_CAMERA,
             ],
             [
-                lambda: caja_mensaje(
-                    mensaje="No hay relaciones para mostrar (Lista).",
-                ),
+                self._relaciones_componente,
                 self._arbol_componente,
                 self._grafo3d_componente,
             ],
@@ -170,6 +170,12 @@ class PersonaVista:
                     ClienteAPI().eventos_persona(self.persona.id)
                 ).add_done_callback(
                     lambda fut: self._actualizar_eventos(fut.result())
+                )
+
+                asyncio.create_task(
+                    ClienteAPI().relaciones_persona(self.persona.id)
+                ).add_done_callback(
+                    lambda fut: self._actualizar_relaciones(fut.result())
                 )
 
                 asyncio.create_task(
@@ -576,6 +582,10 @@ class PersonaVista:
         self._eventos = eventos
         self._actualizar_conmutador_principal()
 
+    def _actualizar_relaciones(self, relaciones: list):
+        self._relaciones = relaciones
+        self._actualizar_conmutador_relaciones()
+
     def _actualizar_arbol(self, arbol: ArbolRelaciones):
         self._arbol = arbol
         self._actualizar_conmutador_relaciones()
@@ -587,6 +597,30 @@ class PersonaVista:
     def _actualizar_conmutador_principal(self):
         self._envoltura_conmutador_principal.content = \
             self.conmutador_principal.construir()
+        
+    def _relaciones_componente(self):
+        return (
+            caja_mensaje(
+                mensaje="No hay relaciones para mostrar.",
+            )
+            if not self._relaciones or self._relaciones == []
+            else ft.Column(
+                [
+                    ElementoRelacion(
+                        relacion=relacion,
+                        persona=self._persona,
+                    )\
+                        .construir()
+                    for relacion in self._relaciones
+                ],
+                scroll=ft.ScrollMode.AUTO,
+                alignment=ft.MainAxisAlignment.START,
+                horizontal_alignment=ft.CrossAxisAlignment.START,
+                spacing=15,
+                expand=True,
+                align=ft.Alignment.TOP_CENTER,
+            )
+        )
     
     def _contexto_componente(self):
         return (

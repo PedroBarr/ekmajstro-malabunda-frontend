@@ -22,6 +22,8 @@ rutas = {
     etiquetas["LIST"]: "/lista",
     etiquetas["DETAIL"]: lambda id: \
         f"/persona/{id}" if id else "/persona",
+    'relacion': lambda id: \
+        f"/relacion/{id}" if id else "/relacion",
 }
 
 # Función asíncrona: Ir a la vista de inicio

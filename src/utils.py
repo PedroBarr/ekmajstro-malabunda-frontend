@@ -35,3 +35,22 @@ def es_ruta(ruta_objetivo: str, ruta_actual: str) -> bool:
     ruta_regex = re.sub(r":\w+", r"[^/]+", ruta_objetivo)
     ruta_regex = f"^{ruta_regex}$"
     return re.match(ruta_regex, ruta_actual) is not None
+
+def normalizar_ruta(ruta_actual: str) -> str:
+    ruta = ruta_actual.split("?")[0]
+    if ruta.endswith("/") and ruta != "/":
+        ruta = ruta[:-1]
+    return ruta
+
+def obtener_parametros(ruta_actual: str) -> dict:
+    parametros = {}
+    if "?" in ruta_actual:
+        query_string = ruta_actual.split("?")[1]
+        for param in query_string.split("&"):
+            key, value = param.split("=")
+            parametros[key] = value
+    return parametros
+
+def obtener_parametro(ruta_actual: str, clave: str) -> str:
+    parametros = obtener_parametros(ruta_actual)
+    return parametros.get(clave, None)

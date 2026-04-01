@@ -60,6 +60,16 @@ class Relacion(BaseModel):
             for relacionado in self.relacionados
         ]
     
+    def es_relacionada(self, persona_id: str): 
+        return any(
+            persona_id == (
+                relacionado.id
+                if isinstance(relacionado, PersonaElemento)
+                else relacionado.get("personaId", {}).get("_id", "")
+            )
+            for relacionado in self.relacionados
+        )
+    
     def agregar_cambios(self, cambios: Dict[str, Any]):
         for clave, valor in cambios.items():
             if clave in self.contexto:

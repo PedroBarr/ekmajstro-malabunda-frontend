@@ -11,6 +11,7 @@ from models.persona import Persona
 
 from components.caja_mensaje import caja_error
 from components.campo_editable import CampoEditable
+from components.carta_persona import CartaPersona
 
 ruta_creacion = rutas['relacion'](None)
 
@@ -198,6 +199,20 @@ class RelacionVista:
             border=ft.Border.all(1, ft.Colors.GREY_700),
             border_radius=20,
         )
+    
+    def _relacionados_componentes(self):
+        return [
+            CartaPersona(
+                persona=persona,
+                al_cambio=lambda cambios: None,
+                relaciones=None,
+                editable=False,
+                expand=1,
+                pagina=self.pagina,
+            )
+            for persona in self.personas
+            if self.relacion.es_relacionada(persona.id)
+        ]
 
     # Función: Obtener render por detalle (formulario de persona)    
     def _controles(self):
@@ -206,6 +221,12 @@ class RelacionVista:
             ft.Row(
                 controls=[
                     ft.Container(
+                        content=ft.Column(
+                            controls=self._relacionados_componentes(),
+                            spacing=10,
+                            scroll="auto",
+                        ),
+                        align=ft.Alignment.TOP_CENTER,
                         expand=1,
                     ),
                 ],

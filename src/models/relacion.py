@@ -71,11 +71,51 @@ class Relacion(BaseModel):
         )
     
     def agregar_cambios(self, cambios: Dict[str, Any]):
+        hay_cambios = False
+        
         for clave, valor in cambios.items():
-            if clave in self.contexto:
+            if clave in self.contexto and self.contexto[clave] != valor:
                 self.contexto[clave] = valor
-            elif hasattr(self, clave):
+                hay_cambios = True
+            elif hasattr(self, clave) and getattr(self, clave) != valor:
                 setattr(self, clave, valor)
+                hay_cambios = True
+
+        return hay_cambios
+    
+    def es_cargable(self) -> bool:
+        descripcion = self.descripcion()
+        fecha = self.fecha()
+
+        return (
+            self.nombre and self.nombre != "" and
+            self.tipo and self.tipo in configuracion.get('tipos_relacion', ["relación_falsa"]) and
+            descripcion and descripcion != "" and
+            fecha and fecha != "" and
+            self.relacionados_cantidad() >= 2 and
+            all(relacionado.id and relacionado.id != "" for relacionado in self.relacionados_personas())
+        )
+    
+    def model_dump(self, **parametros):
+        incluir_id = parametros.get("include_id", True)
+        
+        if "include_id" in parametros: del parametros["include_id"]
+
+        dicc = super().model_dump(**parametros)
+
+        if not incluir_id and "_id" in dicc: del dicc["_id"]
+
+        dicc['contexto'] = self.contexto
+        
+        dicc['relacionados'] = [
+            {
+                "rol": "Relacionado",
+                "personaId": persona.id,
+            }
+            for persona in self.relacionados_personas()
+        ]
+
+        return dicc
 
     @classmethod
     def sintetizar(

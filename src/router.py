@@ -15,7 +15,7 @@ import flet as ft
 import asyncio
 
 from consts import etiquetas
-from utils import es_ruta
+from utils import es_ruta, normalizar_ruta
 
 from components.BFA_principal import BotonFlotanteAccionPrincipal
 
@@ -24,7 +24,11 @@ from views.lista import ruta as ruta_lista, Lista
 from views.persona import (
     ruta as ruta_persona,
     ruta_creacion as ruta_persona_creacion,
-    PersonaVista
+    PersonaVista,
+)
+from views.relacion import (
+    ruta_creacion as ruta_relacion_creacion,
+    RelacionVista,
 )
 
 class Enrutador:
@@ -59,6 +63,20 @@ class Enrutador:
             
             self.pagina.views.append(persona.vista)
             asyncio.create_task(persona.cargar_datos())
+
+        elif (
+            normalizar_ruta(self.pagina.route) == ruta_relacion_creacion
+        ):
+            relacion = RelacionVista(
+                self.pagina,
+                es_creacion=(
+                    normalizar_ruta(self.pagina.route) ==
+                        ruta_relacion_creacion
+                ),
+            )
+
+            self.pagina.views.append(relacion.vista)
+            asyncio.create_task(relacion.cargar_datos())
 
         # Agregar botón flotante de acción principal
         BotonFlotanteAccionPrincipal.instancia().agregar_a_pagina()

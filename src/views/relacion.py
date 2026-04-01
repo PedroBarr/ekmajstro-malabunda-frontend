@@ -12,6 +12,7 @@ from models.persona import Persona
 from components.caja_mensaje import caja_error
 from components.campo_editable import CampoEditable
 from components.carta_persona import CartaPersona
+from components.fila_lista import fila_lista
 
 ruta_creacion = rutas['relacion'](None)
 
@@ -52,10 +53,21 @@ class RelacionVista:
         self.pagina.update()
 
     async def _modificar_relacion(self, cambios: Dict[str, Any]):
-        # calcular cambios
         self.relacion.agregar_cambios(cambios)
         self._actualizar_carta()
         self.pagina.update()
+
+    def _agregar_relacionado(self, persona_id: str):
+        if self.personas is None: return
+
+        persona = self._obtener_persona_por_id(persona_id)
+        if persona is None: return
+        
+        asyncio.create_task(
+            self._modificar_relacion({
+                "relacionados": self.relacion.relacionados + [persona],
+            })
+        )
 
     def _fecha_editor(self, al_editar = lambda fecha: None, **parametros):
         fecha_inicio_evento_selector = ft.DatePicker(
@@ -199,9 +211,35 @@ class RelacionVista:
             border=ft.Border.all(1, ft.Colors.GREY_700),
             border_radius=20,
         )
-    
+
     def _relacionados_componentes(self):
         return [
+            ft.Button(
+                content=ft.Row(
+                    [
+                        ft.Icon(
+                            ft.Icons.ADD,
+                            color=ft.Colors.WHITE,
+                            size=25,
+                        ),
+                        ft.Container(width=10),
+                        ft.Text(
+                            etiquetas["ADD_PERSON"],
+                            color=ft.Colors.WHITE,
+                            size=16,
+                            weight=ft.FontWeight.BOLD,
+                        ),
+                        ft.Container(width=25),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=5
+                ),
+                expand=True,
+                height=50,
+                bgcolor=ft.Colors.PRIMARY,
+                on_click=lambda e: self._agregar_persona_evento(),
+            )
+        ] + [
             CartaPersona(
                 persona=persona,
                 al_cambio=lambda cambios: None,
@@ -256,3 +294,39 @@ class RelacionVista:
             route=ruta_creacion,
             controls=[],
         )
+
+    def _obtener_persona_por_id(self, persona_id: str) -> Persona:
+        return next(
+            (persona for persona in self.personas if persona.id == persona_id),
+            None
+        )
+
+    def _agregar_persona_evento(self):
+        modal = ft.AlertDialog(
+            title=ft.Text("Agregar persona a relación"),
+            content=ft.Column(
+                controls=[
+                    fila_lista(
+                        persona=persona,
+                        on_click=lambda p: (
+                            self._agregar_relacionado(p.id),
+                            self.pagina.pop_dialog(),
+                        ),
+                        compacta=True,
+                    )
+                    for persona in self.personas
+                    if not self.relacion.es_relacionada(persona.id)
+                ],
+                spacing=10,
+                scroll="auto",
+                height=self.pagina.height * 0.5,
+                width=self.pagina.width * 2 / 3,
+            ),
+            actions=[
+                ft.TextButton(
+                    "Cerrar",
+                    on_click=lambda e: self.pagina.pop_dialog(),
+                )
+            ],
+        )
+        self.pagina.show_dialog(modal)

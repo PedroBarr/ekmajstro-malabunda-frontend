@@ -439,35 +439,40 @@ class Grafo3D(ft.Container):
         self._calcular_zona_acercamiento()
         self.dibujar()
 
-    def _al_clic(self, evento: ft.TapEvent):
+    def _al_clic(self, evento: ft.TapEvent, avance=5):
         if (
             self._zona_acercamiento[0][0] <= evento.local_position.x <= self._zona_acercamiento[0][1] and
             self._zona_acercamiento[1][0] <= evento.local_position.y <= self._zona_acercamiento[1][1]
         ):
-            self._escala *= 1.2
+            self._escala *= (1 + 1 / avance)
         else:
             if evento.local_position.x < self._zona_acercamiento[0][0]:
-                self._angulo_acimut -= 15
+                self._angulo_acimut -= avance
             elif evento.local_position.x > self._zona_acercamiento[0][1]:
-                self._angulo_acimut += 15
+                self._angulo_acimut += avance
             
             if evento.local_position.y < self._zona_acercamiento[1][0]:
-                self._angulo_elevacion -= 15
+                self._angulo_elevacion -= avance
             elif evento.local_position.y > self._zona_acercamiento[1][1]:
-                self._angulo_elevacion += 15
+                self._angulo_elevacion += avance
 
         self.dibujar()
 
     def _al_rodar_mouse(self, evento: ft.ScrollEvent):
+        limite_inferior = 50
+        limite_superior = 500
+
+        if not (limite_inferior <= self._escala <= limite_superior): return
+
         pre_escala = self._escala
         escala = self._escala
 
         if evento.scroll_delta.y > 0:
-            escala *= 1.05
+            escala *= 1.01
         elif evento.scroll_delta.y < 0:
-            escala *= 0.995
+            escala *= 0.95
         
-        escala = max(50, min(escala, 500))
+        escala = max(limite_inferior, min(escala, limite_superior))
 
         if abs(escala - pre_escala) > 1:
             self._escala = escala
@@ -599,7 +604,8 @@ class Grafo3D(ft.Container):
                                         local_position=ft.Offset(0, self._centro[1]),
                                         name="arrow_left",
                                         control=e.control
-                                    )
+                                    ),
+                                    avance=10
                                 ),
                             ),
                             base_espacio(),
@@ -618,7 +624,8 @@ class Grafo3D(ft.Container):
                                         local_position=ft.Offset(self._centro[0], 0),
                                         name="arrow_up",
                                         control=e.control
-                                    )
+                                    ),
+                                    avance=10
                                 ),
                             ),
                             base_boton(
@@ -632,7 +639,8 @@ class Grafo3D(ft.Container):
                                         local_position=ft.Offset(self._centro[0], self._dimensiones[1]),
                                         name="arrow_down",
                                         control=e.control
-                                    )
+                                    ),
+                                    avance=10
                                 ),
                             ),
                             base_espacio(),
@@ -643,7 +651,8 @@ class Grafo3D(ft.Container):
                                         local_position=ft.Offset(self._centro[0], self._centro[1]),
                                         name="add",
                                         control=e.control
-                                    )
+                                    ),
+                                    avance=10
                                 ),
                             ),
                             base_boton(
@@ -663,7 +672,8 @@ class Grafo3D(ft.Container):
                                         local_position=ft.Offset(self._dimensiones[0], self._centro[1]),
                                         name="arrow_right",
                                         control=e.control
-                                    )
+                                    ),
+                                    avance=10
                                 ),
                             ),
                             base_espacio(),

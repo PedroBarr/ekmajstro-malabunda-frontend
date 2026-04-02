@@ -9,7 +9,7 @@ from api_client import ClienteAPI
 from models.relacion import Relacion
 from models.persona import Persona
 
-from components.caja_mensaje import caja_error
+from components.caja_mensaje import caja_error, caja_cargando
 from components.campo_editable import CampoEditable
 from components.carta_persona import CartaPersona
 from components.fila_lista import fila_lista
@@ -52,8 +52,36 @@ class RelacionVista:
         self._actualizar_carta()
         self.pagina.update()
 
-    async def _modificar_relacion(self, cambios: Dict[str, Any]):
-        self.relacion.agregar_cambios(cambios)
+    async def _sincronizar_cambios(self):
+        try:
+            if not self.relacion.id or self.relacion.id.strip() == "":
+                self.vista.controls = \
+                    caja_cargando(
+                        etiquetas["LOADING_SYNC"],
+                        size=20,
+                    )
+                self.pagina.update()
+
+                await asyncio.sleep(0.1)
+
+                nueva_relacion = await ClienteAPI()\
+                    .crear_relacion(self.relacion)
+                
+                if nueva_relacion and nueva_relacion.id:
+                    print("Nueva relación creada con ID:", nueva_relacion.id)
+                    self.relacion = nueva_relacion
+                    self._actualizar_carta()
+                    self.pagina.update()
+
+        except Exception as e: self.relacion = None
+
+    def _modificar_relacion(self, cambios: Dict[str, Any]):
+        cambiado = self.relacion.agregar_cambios(cambios)
+        if cambiado:
+            if self.relacion.es_cargable():
+                asyncio.create_task(self._sincronizar_cambios())
+            else: print(etiquetas["UNCOMPLETED_FIELDS"])
+
         self._actualizar_carta()
         self.pagina.update()
 
@@ -63,11 +91,9 @@ class RelacionVista:
         persona = self._obtener_persona_por_id(persona_id)
         if persona is None: return
         
-        asyncio.create_task(
-            self._modificar_relacion({
-                "relacionados": self.relacion.relacionados + [persona],
-            })
-        )
+        self._modificar_relacion({
+            "relacionados": self.relacion.relacionados + [persona],
+        })
 
     def _fecha_editor(self, al_editar = lambda fecha: None, **parametros):
         fecha_inicio_evento_selector = ft.DatePicker(
@@ -95,11 +121,9 @@ class RelacionVista:
                     CampoEditable(
                         "Nombre",
                         self.relacion.nombre,
-                        lambda valor: asyncio.create_task(
-                            self._modificar_relacion({
-                                "nombre": valor,
-                            })
-                        ),
+                        lambda valor: self._modificar_relacion({
+                            "nombre": valor,
+                        }),
                         color_etiqueta=ft.Colors.GREY_400,
                     ),
                     ft.Container(
@@ -150,21 +174,17 @@ class RelacionVista:
                                     ft.Row(
                                         controls=[
                                             self._fecha_editor(
-                                                al_editar=lambda valor: asyncio.create_task(
-                                                    self._modificar_relacion({
-                                                        "fecha": valor,
-                                                    })
-                                                ),
+                                                al_editar=lambda valor: self._modificar_relacion({
+                                                    "fecha": valor,
+                                                }),
                                             ),
                                             ft.Container(width=25),
                                             CampoEditable(
                                                 "Tipo",
                                                 self.relacion.tipo,
-                                                lambda valor: asyncio.create_task(
-                                                    self._modificar_relacion({
-                                                        "tipo": valor,
-                                                    })
-                                                ),
+                                                lambda valor: self._modificar_relacion({
+                                                    "tipo": valor,
+                                                }),
                                                 tipo="lista",
                                                 opciones=configuracion['tipos_relacion'],
                                                 color_etiqueta=ft.Colors.GREY_400,
@@ -179,11 +199,9 @@ class RelacionVista:
                                     CampoEditable(
                                         "Descripción",
                                         self.relacion.descripcion(),
-                                        lambda valor: asyncio.create_task(
-                                            self._modificar_relacion({
-                                                "descripcion": valor,
-                                            })
-                                        ),
+                                        lambda valor: self._modificar_relacion({
+                                            "descripcion": valor,
+                                        }),
                                         tipo="multilinea",
                                         color_etiqueta=ft.Colors.GREY_400,
                                     ),
@@ -267,7 +285,23 @@ class RelacionVista:
                         align=ft.Alignment.TOP_CENTER,
                         expand=1,
                     ),
-                ],
+                ] + (
+                    [
+                        ft.Container(
+                            content=ft.Column(
+                                controls=[
+                                ],
+                                spacing=10,
+                                scroll="auto",
+                            ),
+                            align=ft.Alignment.TOP_CENTER,
+                            expand=1,
+                        ),
+                    ]
+                    if self.relacion.id and self.relacion.id != ""
+                    else []
+                ),
+                spacing=20,
                 expand=True,
             ),
         ]

@@ -170,6 +170,20 @@ class ClienteAPI:
         respuesta = await cliente.get(f"{self._enlace('relacion')}".format(id=id))
         respuesta.raise_for_status()
         return Relacion(**respuesta.json())
+    
+    @envolver_peticion
+    async def parchar_relacion(
+        self,
+        cliente: httpx.AsyncClient,
+        id: str,
+        relacion: dict
+    ):
+        respuesta = await cliente.patch(
+            f"{self._enlace('relacion')}".format(id=id),
+            json=relacion.model_dump(by_alias=True)
+        )
+        respuesta.raise_for_status()
+        return Relacion(**respuesta.json())
 
     @envolver_peticion
     async def relaciones_conteo_persona(self, cliente: httpx.AsyncClient, id: str):

@@ -27,6 +27,7 @@ from views.persona import (
     PersonaVista,
 )
 from views.relacion import (
+    ruta as ruta_relacion,
     ruta_creacion as ruta_relacion_creacion,
     RelacionVista,
 )
@@ -65,6 +66,7 @@ class Enrutador:
             asyncio.create_task(persona.cargar_datos())
 
         elif (
+            es_ruta(ruta_relacion, self.pagina.route) or
             normalizar_ruta(self.pagina.route) == ruta_relacion_creacion
         ):
             relacion = RelacionVista(

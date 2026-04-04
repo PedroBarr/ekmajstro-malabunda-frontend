@@ -1,5 +1,6 @@
 import flet as ft
 import asyncio
+import re
 from typing import Dict, Any, List
 
 from utils import rutas, obtener_parametro
@@ -14,6 +15,7 @@ from components.campo_editable import CampoEditable
 from components.carta_persona import CartaPersona
 from components.fila_lista import fila_lista
 
+ruta = rutas['relacion'](":id")
 ruta_creacion = rutas['relacion'](None)
 
 class RelacionVista:
@@ -44,10 +46,23 @@ class RelacionVista:
                 if persona.id in personas_ids
             ]
 
+    def _obtener_id(self):
+        ruta_actual = self.pagina.route
+        patron = rutas['relacion'](r"([A-Za-z0-9]+)")
+        coincidencia = re.match(patron, ruta_actual)
+        if coincidencia:
+            self.relacion.id = coincidencia.group(1)
+
     async def cargar_datos(self):
         await self._cargar_personas()
-
         self._agregar_personas_a_relacion()
+
+        self._obtener_id()
+
+        if self.relacion.id:
+            try:
+                self.relacion = await ClienteAPI().obtener_relacion(self.relacion.id)
+            except Exception as e: self.relacion = None
 
         self._actualizar_carta()
         self.pagina.update()
@@ -325,7 +340,7 @@ class RelacionVista:
 
     def contruir(self, es_creacion=False):
         self.vista = ft.View(
-            route=ruta_creacion,
+            route=ruta_creacion if es_creacion else ruta,
             controls=[],
         )
 

@@ -69,7 +69,12 @@ class RelacionVista:
 
     async def _sincronizar_cambios(self):
         try:
-            if not self.relacion.id or self.relacion.id.strip() == "":
+            if self.relacion.id:
+                await ClienteAPI().parchar_relacion(self.relacion.id, self.relacion)
+
+                self._actualizar_carta()
+
+            else:
                 self.vista.controls = \
                     caja_cargando(
                         etiquetas["LOADING_SYNC"],

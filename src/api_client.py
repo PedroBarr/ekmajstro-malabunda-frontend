@@ -26,6 +26,7 @@ enlaces = {
     'persona': lambda api: f'{api}/personas/{{id}}',
     'config_tipos_relacion': lambda api: f'{api}/tipos_relacion/config',
     'config_eventos': lambda api: f'{api}/eventos/config',
+    'relacion': lambda api: f'{api}/relaciones/{{id}}',
     'relaciones_conteo_persona': lambda api: f'{api}/relaciones/persona/{{id}}/conteo',
     'relaciones_persona': lambda api: f'{api}/relaciones/persona/{{id}}',
     'relaciones_personas_persona': lambda api: f'{api}/relaciones/personas/{{id}}',
@@ -163,6 +164,12 @@ class ClienteAPI:
         )
         respuesta.raise_for_status()
         return Persona(**respuesta.json())
+    
+    @envolver_peticion
+    async def obtener_relacion(self, cliente: httpx.AsyncClient, id: str):
+        respuesta = await cliente.get(f"{self._enlace('relacion')}".format(id=id))
+        respuesta.raise_for_status()
+        return Relacion(**respuesta.json())
 
     @envolver_peticion
     async def relaciones_conteo_persona(self, cliente: httpx.AsyncClient, id: str):

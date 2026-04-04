@@ -9,11 +9,13 @@ class ElementoRelacion(ft.Container):
         self,
         relacion: Relacion,
         persona: Optional[Persona] = None,
+        al_clic=lambda r: None,
         **parametros
     ):
         super().__init__(**parametros)
         self._relacion = relacion
         self._persona = persona
+        self._al_clic = al_clic
 
     def _celda_relacionado(self, relacionado: Persona, es_primario=True):
         return ft.Row(
@@ -148,4 +150,5 @@ class ElementoRelacion(ft.Container):
             ),
             border=ft.Border.all(1, ft.Colors.GREY_700),
             border_radius=20,
+            on_click=lambda e: self._al_clic(self._relacion),
         )

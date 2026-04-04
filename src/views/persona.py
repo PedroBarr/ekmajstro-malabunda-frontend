@@ -21,6 +21,7 @@ from utils import rutas
 from api_client import ClienteAPI
 
 from models.persona import Persona, PersonaElemento
+from models.relacion import Relacion
 from models.arbol_relaciones import ArbolRelaciones
 
 from components.carta_persona import CartaPersona
@@ -418,6 +419,20 @@ class PersonaVista:
 
         self.pagina.show_dialog(modal)
 
+    def _ver_relacion(self, relacion: Relacion):
+        if relacion.id:
+            ruta = rutas['relacion'](relacion.id)
+            asyncio.create_task(self.pagina.push_route(ruta))
+        else:
+            dialogo = self.alerta_componente(
+                contenido=ft.Text(
+                    "La relación no tiene un ID válido para mostrar detalles.",
+                    size=16,
+                    weight=ft.FontWeight.BOLD,
+                )
+            )
+            self.pagina.show_dialog(dialogo)
+
     def _reportar_error(self):
         modal = ft.AlertDialog(
             title=ft.Text("Reportar un error"),
@@ -605,6 +620,7 @@ class PersonaVista:
                     ElementoRelacion(
                         relacion=relacion,
                         persona=self._persona,
+                        al_clic=self._ver_relacion,
                     )\
                         .construir()
                     for relacion in self._relaciones

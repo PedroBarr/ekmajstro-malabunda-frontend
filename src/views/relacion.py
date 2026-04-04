@@ -3,7 +3,7 @@ import asyncio
 import re
 from typing import Dict, Any, List
 
-from utils import rutas, obtener_parametro
+from utils import rutas, obtener_parametro, normalizar_ruta
 from consts import etiquetas, configuracion
 from api_client import ClienteAPI
 
@@ -47,11 +47,32 @@ class RelacionVista:
             ]
 
     def _obtener_id(self):
-        ruta_actual = self.pagina.route
+        ruta_actual = normalizar_ruta(self.pagina.route)
         patron = rutas['relacion'](r"([A-Za-z0-9]+)")
         coincidencia = re.match(patron, ruta_actual)
         if coincidencia:
             self.relacion.id = coincidencia.group(1)
+        else:
+            asyncio.create_task(self._validar_ruta_inutil())
+
+    async def _validar_ruta_inutil(self):
+        terna_vistas = (
+            self.pagina.views[-3:]
+            if len(self.pagina.views) >= 3
+            else self.pagina.views
+        )
+
+        if (
+            all(
+                terna_vistas[i].route == ruta_creacion
+                for i in [0, -1]
+            ) and
+            terna_vistas[1].route == ruta
+        ):
+            await self.pagina.on_view_pop(True)
+            await self.pagina.on_view_pop(True)
+            await self.pagina.on_view_pop(True)
+            await self.pagina.push_route(rutas['Inicio'])
 
     async def cargar_datos(self):
         await self._cargar_personas()
@@ -88,10 +109,9 @@ class RelacionVista:
                     .crear_relacion(self.relacion)
                 
                 if nueva_relacion and nueva_relacion.id:
-                    print("Nueva relación creada con ID:", nueva_relacion.id)
-                    self.relacion = nueva_relacion
-                    self._actualizar_carta()
-                    self.pagina.update()
+                    ruta_nueva = rutas['relacion'](nueva_relacion.id)
+
+                    await self.pagina.push_route(ruta_nueva)
 
         except Exception as e: self.relacion = None
 

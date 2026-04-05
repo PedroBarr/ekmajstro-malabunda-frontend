@@ -25,6 +25,7 @@ class RelacionVista:
         es_creacion=False,
     ):
         self.pagina = pagina
+        self._archivo = None
 
         self.relacion = Relacion.sintetizar()
         self.personas: List[Persona] = []
@@ -350,7 +351,7 @@ class RelacionVista:
     def _carta_fallida(self):
         return [
             caja_error(
-                etiquetas["ERROR_LOADING_DETAIL"],
+                'Error al cargar la relación',
                 size=20,
             )
         ]
@@ -404,3 +405,97 @@ class RelacionVista:
             ],
         )
         self.pagina.show_dialog(modal)
+
+    def _modal_agregar_fuente_componente(self):
+        return ft.Column(
+            controls=[
+                CampoEditable(
+                    "Nombre de la fuente",
+                    "",
+                    lambda valor: None,
+                    color_etiqueta=ft.Colors.GREY_400,
+                ),
+                CampoEditable(
+                    "Descripción de la fuente",
+                    "",
+                    lambda valor: None,
+                    tipo="multilinea",
+                    color_etiqueta=ft.Colors.GREY_400,
+                ),
+                ft.Container(
+                    content=ft.Row(
+                        [
+                            ft.Icon(
+                                ft.Icons.ADD_LINK_ROUNDED,
+                                color=ft.Colors.WHITE,
+                                size=25,
+                            ),
+                            ft.Container(width=10),
+                            ft.Text(
+                                "Agregar fuente",
+                                color=ft.Colors.WHITE,
+                                size=16,
+                                weight=ft.FontWeight.BOLD,
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        spacing=5
+                    ),
+                    expand=True,
+                    height=40,
+                    bgcolor=ft.Colors.TRANSPARENT,
+                    border_radius=20,
+                    border=ft.Border.all(3, ft.Colors.PRIMARY),
+                    on_click=self._manejador_elegir_archivos,
+                )
+            ],
+            spacing=10,
+            expand=False,
+            height=200,
+        )
+    
+    def _abrir_modal_agregar_fuente(self, e):
+        modal = ft.AlertDialog(
+            title=ft.Text("Agregar una nueva fuente"),
+            content=self._modal_agregar_fuente_componente(),
+            actions=[
+                ft.TextButton("Cancelar", on_click=lambda e: self.pagina.pop_dialog()),
+                ft.TextButton(
+                    "Agregar",
+                    on_click=lambda e: asyncio.create_task(self._anexar_fuente(modal))
+                )
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+        
+        self.pagina.show_dialog(modal)
+
+    async def _manejador_elegir_archivos(self, e):
+        seleccion = await ft.FilePicker().pick_files(
+            allow_multiple=False,
+            with_data=True,
+        )
+        
+        if seleccion and len(seleccion) > 0:
+            self._archivo = seleccion[0]
+        else:
+            self._archivo = None
+
+    async def _anexar_fuente(self, modal):
+        if self._archivo is None: return
+
+        nombre = modal.content.controls[0].valor.strip()
+        descripcion = modal.content.controls[1].valor.strip()
+        
+        fuente = {
+            "nombre": nombre if nombre != "" else self._archivo.name,
+            "descripcion": descripcion,
+            "archivo": self._archivo,
+        }
+
+        try:
+            fuente = await ClienteAPI().anexar_fuente(self.relacion.id, fuente)
+            if fuente: await self.cargar_datos()
+            else: raise Exception("No se pudo anexar la fuente")
+        except Exception as e: print("Error al anexar fuente:", e)
+        self.pagina.pop_dialog()

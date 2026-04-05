@@ -161,13 +161,6 @@ class RelacionVista:
                 "relacionados": self.relacion.relacionados + [relacionado],
             })
 
-            self._relacionados.append({
-                "persona": persona,
-                "relacion": relacionado,
-            })
-            self._actualizar_carta()
-            self.pagina.update()
-
     def _fecha_editor(self, al_editar = lambda fecha: None, **parametros):
         fecha_inicio_evento_selector = ft.DatePicker(
             on_change=lambda e: (

@@ -26,10 +26,12 @@ class RelacionVista:
         es_creacion=False,
     ):
         self.pagina = pagina
-        self._archivo = None
 
         self.relacion = Relacion.sintetizar()
         self.personas: List[Persona] = []
+
+        self._archivo = None
+        self._relacionados = []
 
         self.contruir(es_creacion=es_creacion)
 
@@ -85,10 +87,25 @@ class RelacionVista:
         if self.relacion.id:
             try:
                 self.relacion = await ClienteAPI().obtener_relacion(self.relacion.id)
+                self._llenar_relacionados()
             except Exception as e: self.relacion = None
 
         self._actualizar_carta()
         self.pagina.update()
+
+    def _llenar_relacionados(self):
+        relacionados = []
+
+        for persona in self.personas:
+            relacionado = self.relacion.traer_relacionado(persona.id)
+
+            if relacionado:
+                relacionados.append({
+                    "persona": persona,
+                    "relacion": relacionado,
+                })
+
+        self._relacionados = relacionados
 
     async def _sincronizar_cambios(self):
         try:
@@ -132,10 +149,20 @@ class RelacionVista:
 
         persona = self._obtener_persona_por_id(persona_id)
         if persona is None: return
+
+        relacionado = self.relacion.agregar_relacionado(persona, modo_retorno=True)
         
-        self._modificar_relacion({
-            "relacionados": self.relacion.relacionados + [persona],
-        })
+        if relacionado:
+            self._modificar_relacion({
+                "relacionados": self.relacion.relacionados + [relacionado],
+            })
+
+            self._relacionados.append({
+                "persona": persona,
+                "relacion": relacionado,
+            })
+            self._actualizar_carta()
+            self.pagina.update()
 
     def _fecha_editor(self, al_editar = lambda fecha: None, **parametros):
         fecha_inicio_evento_selector = ft.DatePicker(
@@ -301,15 +328,14 @@ class RelacionVista:
             )
         ] + [
             CartaPersona(
-                persona=persona,
+                persona=relacionado["persona"],
                 al_cambio=lambda cambios: None,
                 relaciones=None,
                 editable=False,
                 expand=1,
                 pagina=self.pagina,
             )
-            for persona in self.personas
-            if self.relacion.es_relacionada(persona.id)
+            for relacionado in self._relacionados
         ]
     
     def _fuentes_componentes(self):

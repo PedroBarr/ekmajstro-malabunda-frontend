@@ -37,6 +37,7 @@ enlaces = {
     'eventos_persona': lambda api: f'{api}/eventos/persona/{{id}}',
     'crear_evento_persona': lambda api: f'{api}/eventos',
     'anexar_fuente': lambda api: f'{api}/fuentes/anexar/{{id}}',
+    'desvincular_fuente': lambda api: f'{api}/fuentes/desvincular',
 }
 
 class ClienteAPI:
@@ -301,3 +302,22 @@ class ClienteAPI:
         respuesta.raise_for_status()
         return respuesta.json()
 
+    @envolver_peticion
+    async def desvincular_fuente(
+        self,
+        cliente: httpx.AsyncClient,
+        id: str,
+        fuente_id: str,
+        tipo_entidad: str = 'relacion' # o 'evento', dependiendo de la entidad a la que se quiera desvincular la fuente
+    ):
+        assert tipo_entidad in ['relacion', 'evento'], "El tipo de entidad debe ser 'relacion' o 'evento'."
+        respuesta = await cliente.patch(
+            f"{self._enlace('desvincular_fuente')}",
+            json={
+                'elementoVinculadoId': id,
+                'fuenteId': fuente_id,
+                'tipoVinculo': tipo_entidad
+            }
+        )
+        respuesta.raise_for_status()
+        return respuesta.json()

@@ -327,13 +327,23 @@ class RelacionVista:
                 on_click=lambda e: self._agregar_persona_evento(),
             )
         ] + [
-            CartaPersona(
-                persona=relacionado["persona"],
-                al_cambio=lambda cambios: None,
-                relaciones=None,
-                editable=False,
-                expand=1,
-                pagina=self.pagina,
+            ft.Column(
+                controls=[
+                    ft.Text(
+                        relacionado["relacion"]["rol"],
+                        size=12,
+                        color=ft.Colors.ON_SURFACE,
+                    ),
+                    CartaPersona(
+                        persona=relacionado["persona"],
+                        al_cambio=lambda cambios: None,
+                        relaciones=None,
+                        editable=False,
+                        expand=1,
+                        pagina=self.pagina,
+                    )
+                ],
+                spacing=0,
             )
             for relacionado in self._relacionados
         ]
@@ -385,7 +395,7 @@ class RelacionVista:
                         al_clic=lambda f: None,
                     ).construir()
                 ],
-                spacing=5,
+                spacing=0,
             )
             for fuente in self.relacion.fuentes
         ]

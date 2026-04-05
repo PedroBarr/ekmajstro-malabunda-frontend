@@ -137,8 +137,12 @@ class RelacionVista:
     def _modificar_relacion(self, cambios: Dict[str, Any]):
         cambiado = self.relacion.agregar_cambios(cambios)
         if cambiado:
+            if "relacionados" in cambios:
+                self._llenar_relacionados()
+
             if self.relacion.es_cargable():
                 asyncio.create_task(self._sincronizar_cambios())
+
             else: print(etiquetas["UNCOMPLETED_FIELDS"])
 
         self._actualizar_carta()
@@ -300,6 +304,36 @@ class RelacionVista:
         )
 
     def _relacionados_componentes(self):
+        fila_relacionado = lambda relacionado: ft.Container(
+            content=ft.Row(
+                controls=[
+                    CampoEditable(
+                        "Relación",
+                        relacionado["relacion"]["rol"],
+                        lambda valor: self._modificar_relacion({
+                            "relacionados": [
+                                {
+                                    **r,
+                                    "rol": valor if r == relacionado["relacion"] else r["rol"],
+                                }
+                                for r in self.relacion.relacionados
+                            ]
+                        }),
+                        color_etiqueta=ft.Colors.GREY_400,
+                    ),
+                    ft.Container(expand=True),
+                    ft.IconButton(
+                        ft.Icons.PERSON_REMOVE_OUTLINED,
+                        icon_color=ft.Colors.RED_300,
+                        icon_size=15,
+                        # on_click=lambda e: self._eliminar_relacionado(relacionado["persona"].id),
+                        on_click=lambda e: None,
+                    )
+                ],
+            ),
+            padding=ft.Padding(15, 0, 10, 0),
+        )
+
         return [
             ft.Button(
                 content=ft.Row(
@@ -329,11 +363,7 @@ class RelacionVista:
         ] + [
             ft.Column(
                 controls=[
-                    ft.Text(
-                        relacionado["relacion"]["rol"],
-                        size=12,
-                        color=ft.Colors.ON_SURFACE,
-                    ),
+                    fila_relacionado(relacionado),
                     CartaPersona(
                         persona=relacionado["persona"],
                         al_cambio=lambda cambios: None,

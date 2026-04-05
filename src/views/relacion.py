@@ -313,6 +313,18 @@ class RelacionVista:
         ]
     
     def _fuentes_componentes(self):
+        fila_eliminar_fuente = lambda fuente_id: ft.Row(
+            controls=[
+                ft.Container(expand=True),
+                ft.IconButton(
+                    ft.Icons.BOOKMARK_REMOVE_OUTLINED,
+                    icon_color=ft.Colors.RED_300,
+                    icon_size=15,
+                    on_click=lambda e: asyncio.create_task(self._desvincular_fuente(fuente_id)),
+                )
+            ],
+        )
+
         return [
             ft.Button(
                 content=ft.Row(
@@ -339,10 +351,16 @@ class RelacionVista:
                 on_click=lambda e: self._abrir_modal_agregar_fuente(e),
             )
         ] + [
-            ElementoFuente(
-                fuente=fuente,
-                al_clic=lambda f: None,
-            ).construir()
+            ft.Column(
+                controls=[
+                    fila_eliminar_fuente(fuente["_id"]),
+                    ElementoFuente(
+                        fuente=fuente,
+                        al_clic=lambda f: None,
+                    ).construir()
+                ],
+                spacing=5,
+            )
             for fuente in self.relacion.fuentes
         ]
 
@@ -533,3 +551,10 @@ class RelacionVista:
             else: raise Exception("No se pudo anexar la fuente")
         except Exception as e: print("Error al anexar fuente:", e)
         self.pagina.pop_dialog()
+
+    async def _desvincular_fuente(self, fuente_id):
+        try:
+            exito = await ClienteAPI().desvincular_fuente(self.relacion.id, fuente_id)
+            if exito: await self.cargar_datos()
+            else: raise Exception("No se pudo desvincular la fuente")
+        except Exception as e: print("Error al desvincular fuente:", e)

@@ -109,10 +109,10 @@ class Relacion(BaseModel):
         
         dicc['relacionados'] = [
             {
-                "rol": "Relacionado",
-                "personaId": persona.id,
+                "rol": relacionado.rol if isinstance(relacionado, PersonaElemento) else relacionado.get("rol", "Relacionado"),
+                "personaId": relacionado["personaId"]["_id"] if isinstance(relacionado, dict) else relacionado.id,
             }
-            for persona in self.relacionados_personas()
+            for relacionado in self.relacionados
         ]
 
         return dicc

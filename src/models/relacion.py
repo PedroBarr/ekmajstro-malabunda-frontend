@@ -181,3 +181,33 @@ class Relacion(BaseModel):
             tipo=_tipo,
             contexto=_contexto,
         )
+    
+    def traer_relacionado(self, personaId: str) -> PersonaElemento | Dict | None:
+        for relacionado in self.relacionados:
+            persona = (
+                relacionado
+                if isinstance(relacionado, PersonaElemento)
+                else PersonaElemento(**relacionado.get("personaId", {}))
+            )
+            if persona.id == personaId: return relacionado
+        
+        return None
+    
+    def agregar_relacionado(
+        self,
+        persona: PersonaElemento,
+        rol: str = "Relacionado",
+        modo_retorno: bool = False,
+    ):
+        personaJson = persona.model_dump(by_alias=True, exclude={"metadatos",})
+        if modo_retorno:
+            return {
+                "personaId": personaJson,
+                "rol": rol,
+            }
+        
+        if not self.traer_relacionado(persona.id):
+            self.relacionados.append({
+                "personaId": personaJson,
+                "rol": rol,
+            })

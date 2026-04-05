@@ -326,8 +326,7 @@ class RelacionVista:
                         ft.Icons.PERSON_REMOVE_OUTLINED,
                         icon_color=ft.Colors.RED_300,
                         icon_size=15,
-                        # on_click=lambda e: self._eliminar_relacionado(relacionado["persona"].id),
-                        on_click=lambda e: None,
+                        on_click=lambda e: self._eliminar_relacionado(relacionado["persona"].id),
                     )
                 ],
             ),
@@ -624,3 +623,14 @@ class RelacionVista:
             if exito: await self.cargar_datos()
             else: raise Exception("No se pudo desvincular la fuente")
         except Exception as e: print("Error al desvincular fuente:", e)
+
+    def _eliminar_relacionado(self, persona_id: str):
+        relacionado = self.relacion.traer_relacionado(persona_id)
+        if relacionado is None: return
+
+        self._modificar_relacion({
+            "relacionados": [
+                r for r in self.relacion.relacionados
+                if r != relacionado
+            ]
+        })

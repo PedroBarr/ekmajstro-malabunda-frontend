@@ -12,6 +12,7 @@
 #-------------------------------------------------------------------------------
 
 import httpx
+import mimetypes
 
 from consts import api_url, api_tiempo_espera, etiquetas
 
@@ -35,6 +36,7 @@ enlaces = {
     'crear_relacion': lambda api: f'{api}/relaciones',
     'eventos_persona': lambda api: f'{api}/eventos/persona/{{id}}',
     'crear_evento_persona': lambda api: f'{api}/eventos',
+    'anexar_fuente': lambda api: f'{api}/fuentes/anexar/{{id}}',
 }
 
 class ClienteAPI:
@@ -267,3 +269,35 @@ class ClienteAPI:
         respuesta = await cliente.post(self._enlace('crear_evento_persona'),json=evento)
         respuesta.raise_for_status()
         return respuesta.json()
+    
+    @envolver_peticion
+    async def anexar_fuente(
+        self,
+        cliente: httpx.AsyncClient,
+        id: str,
+        fuente: dict # debe contener 'nombre', 'descripcion' y 'archivo' (ft.FilePickerFile with bytes)
+    ):
+        # hacer un patch form-data con las llaves 'nombre' y 'descripcion' (de tipo texto), y 'archivo' (de tipo file)
+        assert (
+            'nombre' in fuente and
+            'descripcion' in fuente and
+            'archivo' in fuente and
+            hasattr(fuente['archivo'], 'name') and
+            hasattr(fuente['archivo'], 'bytes')
+        ), "La fuente no pudo ser anexada por datos faltantes o mal formateados."
+        tipo = mimetypes.guess_type(fuente['archivo'].name)[0] or 'application/octet-stream'
+        archivos = {
+            'archivo': (fuente['archivo'].name, fuente['archivo'].bytes, tipo)
+        }
+        datos = {
+            'nombre': fuente['nombre'],
+            'descripcion': fuente['descripcion']
+        }
+        respuesta = await cliente.patch(
+            f"{self._enlace('anexar_fuente')}".format(id=id),
+            data=datos,
+            files=archivos
+        )
+        respuesta.raise_for_status()
+        return respuesta.json()
+

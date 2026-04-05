@@ -14,6 +14,7 @@ from components.caja_mensaje import caja_error, caja_cargando
 from components.campo_editable import CampoEditable
 from components.carta_persona import CartaPersona
 from components.fila_lista import fila_lista
+from components.elemento_fuente import ElementoFuente
 
 ruta = rutas['relacion'](":id")
 ruta_creacion = rutas['relacion'](None)
@@ -310,6 +311,40 @@ class RelacionVista:
             for persona in self.personas
             if self.relacion.es_relacionada(persona.id)
         ]
+    
+    def _fuentes_componentes(self):
+        return [
+            ft.Button(
+                content=ft.Row(
+                    [
+                        ft.Icon(
+                            ft.Icons.ADD_LINK_ROUNDED,
+                            color=ft.Colors.WHITE,
+                            size=25,
+                        ),
+                        ft.Container(width=10),
+                        ft.Text(
+                            "Agregar fuente",
+                            color=ft.Colors.WHITE,
+                            size=16,
+                            weight=ft.FontWeight.BOLD,
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=5
+                ),
+                expand=True,
+                height=50,
+                bgcolor=ft.Colors.PRIMARY,
+                on_click=lambda e: self._abrir_modal_agregar_fuente(e),
+            )
+        ] + [
+            ElementoFuente(
+                fuente=fuente,
+                al_clic=lambda f: None,
+            ).construir()
+            for fuente in self.relacion.fuentes
+        ]
 
     # Función: Obtener render por detalle (formulario de persona)    
     def _controles(self):
@@ -330,8 +365,7 @@ class RelacionVista:
                     [
                         ft.Container(
                             content=ft.Column(
-                                controls=[
-                                ],
+                                controls=self._fuentes_componentes(),
                                 spacing=10,
                                 scroll="auto",
                             ),

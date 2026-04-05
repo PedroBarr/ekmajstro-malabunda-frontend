@@ -286,7 +286,7 @@ class CartaPersona(ft.Card):
                                     disabled=not self.persona or not self.persona.id,
                                     expand=1,
                                 )
-                                if self._es_editable else ft.Container(expand=1)
+                                if self._es_editable else ft.Container(expand=0)
                             ),
                             (
                                 ft.Button(
@@ -297,7 +297,7 @@ class CartaPersona(ft.Card):
                                     disabled=not self.persona or not self.persona.id,
                                     expand=1,
                                 )
-                                if self._es_editable else ft.Container(expand=1)
+                                if self._es_editable else ft.Container(expand=0)
                             )
                         ],
                         alignment=ft.MainAxisAlignment.END,

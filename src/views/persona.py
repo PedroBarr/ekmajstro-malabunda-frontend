@@ -159,42 +159,71 @@ class PersonaVista:
                 self.persona = await ClienteAPI().obtener_persona(
                     self.persona.id
                 )
+
                 self._actualizar_persona()
+                self._actualizar_carta()
+
+                cantidad_tareas = 6
+                realizadas = {"valor": 0}
 
                 asyncio.create_task(
                     ClienteAPI().relaciones_conteo_persona(self.persona.id)
                 ).add_done_callback(
-                    lambda fut: self._actualizar_relaciones_conteo(fut.result())
+                    lambda fut: (
+                        self._actualizar_relaciones_conteo(fut.result()),
+                        realizadas.__setitem__("valor", realizadas["valor"] + 1),
+                        self.pagina.update() if realizadas["valor"] == cantidad_tareas else None,
+                    )
                 )
 
                 asyncio.create_task(
                     ClienteAPI().eventos_persona(self.persona.id)
                 ).add_done_callback(
-                    lambda fut: self._actualizar_eventos(fut.result())
+                    lambda fut: (
+                        self._actualizar_eventos(fut.result()),
+                        realizadas.__setitem__("valor", realizadas["valor"] + 1),
+                        self.pagina.update() if realizadas["valor"] == cantidad_tareas else None,
+                    )
                 )
 
                 asyncio.create_task(
                     ClienteAPI().relaciones_persona(self.persona.id)
                 ).add_done_callback(
-                    lambda fut: self._actualizar_relaciones(fut.result())
+                    lambda fut: (
+                        self._actualizar_relaciones(fut.result()),
+                        realizadas.__setitem__("valor", realizadas["valor"] + 1),
+                        self.pagina.update() if realizadas["valor"] == cantidad_tareas else None,
+                    )
                 )
 
                 asyncio.create_task(
                     ClienteAPI().relaciones_personas_persona(self.persona.id)
                 ).add_done_callback(
-                    lambda fut: self._actualizar_personas(fut.result())
+                    lambda fut: (
+                        self._actualizar_personas(fut.result()),
+                        realizadas.__setitem__("valor", realizadas["valor"] + 1),
+                        self.pagina.update() if realizadas["valor"] == cantidad_tareas else None,
+                    )
                 )
 
                 asyncio.create_task(
                     ClienteAPI().relaciones_arbol_persona(self.persona)
                 ).add_done_callback(
-                    lambda fut: self._actualizar_arbol(fut.result())
+                    lambda fut: (
+                        self._actualizar_arbol(fut.result()),
+                        realizadas.__setitem__("valor", realizadas["valor"] + 1),
+                        self.pagina.update() if realizadas["valor"] == cantidad_tareas else None,
+                    )
                 )
 
                 asyncio.create_task(
                     ClienteAPI().relaciones_grafo_persona(self.persona)
                 ).add_done_callback(
-                    lambda fut: self._actualizar_grafo(fut.result())
+                    lambda fut: (
+                        self._actualizar_grafo(fut.result()),
+                        realizadas.__setitem__("valor", realizadas["valor"] + 1),
+                        self.pagina.update() if realizadas["valor"] == cantidad_tareas else None,
+                    )
                 )
 
             except Exception as e: self.persona = None

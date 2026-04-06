@@ -41,14 +41,23 @@ class RelacionVista:
             self.personas = None
 
     def _agregar_personas_a_relacion(self):
-        # get query parameter "personas"
         personas = obtener_parametro(self.pagina.route, "personas")
         if personas and self.personas is not None:
             personas_ids = personas.split(",")
-            self.relacion.relacionados = [
-                persona for persona in self.personas
-                if persona.id in personas_ids
-            ]
+            
+            relacionados = []
+            
+            if len(personas_ids) > 0:
+                for persona in self.personas:
+                    if persona.id in personas_ids and not self.relacion.es_relacionada(persona.id):
+                        relacionado = self.relacion.agregar_relacionado(persona, modo_retorno=True)
+                        
+                        if relacionado: relacionados.append(relacionado)
+            
+            if len(relacionados) > 0:
+                self._modificar_relacion({
+                    "relacionados": self.relacion.relacionados + relacionados,
+                })
 
     def _obtener_id(self):
         ruta_actual = normalizar_ruta(self.pagina.route)

@@ -29,12 +29,14 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
 
     # Método dunder de inicialización
     def __init__(self, pagina: ft.Page):
-        super().__init__()
+        super().__init__(
+            shape=ft.CircleBorder(),
+        )
         self.pagina = pagina
         self.content = ft.Image(
             src="favicon.svg",
-            width=36,
-            height=36,
+            width=30,
+            height=30,
             color=ft.Colors.with_opacity(0.75, ft.Colors.WHITE),
         )
         self.on_click = lambda _: \

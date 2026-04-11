@@ -28,7 +28,7 @@ jobs:
 
       - name: Construir la distribución
         run: |
-          flet publish src/main.py --base-url /ekmajstro-malabunda-frontend/
+          flet publish src/main.py --base-url /ekmajstro-malabunda-frontend/ --pwa-background-color "#1F1D2A" --app-name "Ekmajstro Malabunda" --app-short-name "Malabunda" --app-description "(Ekmajstro) Malabunda es un sistema para la gestión de entes políticos con el objetivo de permitir la visualización de un grafo de oligarquía, así como la consulta de datos tipo bitácora de cada ente político y su respectivo cálculo del grado de oligarquía." --app-theme-color "#1F1D2A"
       
       - name: Agregar archivo 404.html
         run: cp src/dist/index.html src/dist/404.html

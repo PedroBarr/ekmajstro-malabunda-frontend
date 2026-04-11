@@ -1,11 +1,11 @@
 {
-  "name": "src",
-  "short_name": "src",
+  "name": "Ekmajstro Malabunda",
+  "short_name": "Malabunda",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#FFFFFF",
-  "theme_color": "#0175C2",
-  "description": "Flet - the fastest way to build Flutter apps in Python",
+  "background_color": "#1F1D2A",
+  "theme_color": "#1F1D2A",
+  "description": "(Ekmajstro) Malabunda es un sistema para la gesti\u00f3n de entes pol\u00edticos con el objetivo de permitir la visualizaci\u00f3n de un grafo de oligarqu\u00eda, as\u00ed como la consulta de datos tipo bit\u00e1cora de cada ente pol\u00edtico y su respectivo c\u00e1lculo del grado de oligarqu\u00eda.",
   "orientation": "natural",
   "prefer_related_applications": false,
   "icons": [

@@ -14,7 +14,7 @@ import flet as ft
 import asyncio
 
 from consts import etiquetas
-from utils import ir_a_inicio
+from utils import ir_a_inicio, rutas
 
 from views.bienvenida import ruta as ruta_bienvenida
 
@@ -33,12 +33,19 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
             shape=ft.CircleBorder(),
         )
         self.pagina = pagina
-        self.content = ft.Image(
-            src="favicon.svg",
-            width=30,
-            height=30,
-            color=ft.Colors.with_opacity(0.75, ft.Colors.WHITE),
+
+        self.content=ft.GestureDetector(
+            content=ft.Image(
+                src="favicon.svg",
+                width=30,
+                height=30,
+                color=ft.Colors.with_opacity(0.75, ft.Colors.WHITE),
+            ),
+            on_secondary_tap=self._al_clic_derecho,
+            on_secondary_tap_down=self._pre_clic_derecho,
+            on_secondary_tap_up=self._pos_clic_derecho,
         )
+
         self.on_click = lambda _: \
             asyncio.create_task(ir_a_inicio(self.pagina))
 
@@ -78,3 +85,39 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
             cls._instancia = cls(pagina)
 
         return cls._instancia
+    
+    async def _pre_clic_derecho(self, evento: ft.TapEvent):
+        await ft.BrowserContextMenu().disable()
+
+    def _lista_menu_contextual(self):
+        return ft.Column(
+            controls=[
+                ft.TextButton(
+                    content="Crear persona",
+                    on_click=lambda _: (
+                        asyncio.create_task(
+                            self.pagina.push_route(rutas[etiquetas["DETAIL"]](None))
+                        ),
+                        self.pagina.pop_dialog(),
+                    ),
+                    style=ft.ButtonStyle(
+                        color=ft.Colors.ON_PRIMARY,
+                        overlay_color=ft.Colors.with_opacity(0.1, ft.Colors.ON_PRIMARY),
+                    ),
+                ),
+            ],
+            tight=True,
+        )
+    
+    async def _al_clic_derecho(self, evento: ft.ControlEventHandler):
+        self.pagina.show_dialog(ft.SnackBar(
+            content=self._lista_menu_contextual(),
+            show_close_icon=True,
+            close_icon_color=ft.Colors.ON_PRIMARY,
+            persist=True,
+            behavior=ft.SnackBarBehavior.FLOATING,
+            bgcolor=ft.Colors.ON_ERROR,
+        ))
+
+    async def _pos_clic_derecho(self, evento: ft.ControlEventHandler):
+        await ft.BrowserContextMenu().enable()

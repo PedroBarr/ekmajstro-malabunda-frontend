@@ -20,6 +20,7 @@ def nodo_persona(persona: Persona, **parametros) -> ft.Container:
                     f"{persona.nombre} {persona.apellido}",
                     size=12,
                     weight=ft.FontWeight.BOLD,
+                    text_align=ft.TextAlign.CENTER,
                 )
             ],
              spacing=5,

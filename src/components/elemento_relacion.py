@@ -75,6 +75,7 @@ class ElementoRelacion(ft.Container):
                     color=ft.Colors.WHITE,
                     weight=ft.FontWeight.BOLD,
                     size=24,
+                    text_align=ft.TextAlign.CENTER,
                 ),
                 ft.Container(
                     height=8,

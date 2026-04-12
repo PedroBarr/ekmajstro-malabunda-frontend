@@ -34,16 +34,39 @@ class BotonFlotanteAccionPrincipal(ft.FloatingActionButton):
         )
         self.pagina = pagina
 
-        self.content=ft.GestureDetector(
+        imagen_ruta = "favicon.svg"
+        imagen_inactiva = ft.Image(
+            src=imagen_ruta,
+            width=30,
+            height=30,
+            color=ft.Colors.with_opacity(0.75, ft.Colors.WHITE),
+        )
+        imagen_activa = ft.Container(
             content=ft.Image(
-                src="favicon.svg",
+                src=imagen_ruta,
                 width=30,
                 height=30,
-                color=ft.Colors.with_opacity(0.75, ft.Colors.WHITE),
             ),
+            shadow=ft.BoxShadow(
+                color=ft.Colors.with_opacity(0.5, ft.Colors.ON_ERROR),
+                blur_radius=9,
+                spread_radius=9,
+            ),
+        )
+
+        self.content=ft.GestureDetector(
+            content=imagen_inactiva,
             on_secondary_tap=self._al_clic_derecho,
             on_secondary_tap_down=self._pre_clic_derecho,
             on_secondary_tap_up=self._pos_clic_derecho,
+            on_enter=lambda _: (
+                setattr(self.content, "content", imagen_activa),
+                self.update(),
+            ),
+            on_exit=lambda _: (
+                setattr(self.content, "content", imagen_inactiva),
+                self.update(),
+            ),
         )
 
         self.on_click = lambda _: \

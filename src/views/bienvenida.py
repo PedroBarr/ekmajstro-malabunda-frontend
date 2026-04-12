@@ -71,6 +71,7 @@ async def Bienvenida(pagina: ft.Page):
                         icon=ft.Icons.LIST,
                         on_click=ir_a_lista,
                         height=50,
+                        color=ft.Colors.ON_PRIMARY,
                     ),
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,

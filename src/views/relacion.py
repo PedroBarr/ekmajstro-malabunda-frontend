@@ -365,20 +365,41 @@ class RelacionVista:
             ft.Column(
                 controls=[
                     fila_relacionado(relacionado),
-                    CartaPersona(
-                        persona=relacionado["persona"],
-                        al_cambio=lambda cambios: None,
-                        relaciones=None,
-                        editable=False,
-                        expand=1,
-                        pagina=self.pagina,
-                    )
+                    self.cartaRelacionado(relacionado),
                 ],
                 spacing=0,
             )
             for relacionado in self._relacionados
         ]
     
+    def cartaRelacionado(self, relacionado):
+        carta =CartaPersona(
+            persona=relacionado["persona"],
+            al_cambio=lambda cambios: None,
+            relaciones=None,
+            editable=False,
+            expand=1,
+            pagina=self.pagina,
+        )
+
+        if self.relacion.id and self.relacion.id != "":
+            return ft.ContextMenu(
+                content=carta,
+                primary_items=[
+                    ft.PopupMenuItem(
+                        content="Ir a persona",
+                        on_click=lambda e: asyncio.create_task(
+                            self.pagina.push_route(
+                                rutas[etiquetas['DETAIL']](relacionado["persona"].id)
+                            )
+                        ),
+                    ),
+                ],
+                primary_trigger=ft.ContextMenuTrigger.LONG_PRESS,
+            )
+        else:
+            return carta
+
     def _fuentes_componentes(self):
         fila_eliminar_fuente = lambda fuente_id: ft.Row(
             controls=[

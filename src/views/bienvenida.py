@@ -74,7 +74,7 @@ async def Bienvenida(pagina: ft.Page):
                                 etiquetas["WELCOME_DESCRIPTION"],
                                 size=16,
                                 text_align=ft.TextAlign.JUSTIFY,
-                                width=pagina.width * 0.8,
+                                width=pagina.width * 0.6,
                             ),
                             ft.Row(
                                 [

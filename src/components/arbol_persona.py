@@ -1,13 +1,16 @@
 import flet as ft
+import asyncio
 
+from consts import etiquetas
+from utils import rutas
 from models.persona import Persona
 from models.arbol_relaciones import ArbolRelaciones
 
 from themes import estilos_config
 
 def nodo_persona(
-    persona: Persona,
-    rol: str = "Relacionado",
+    relacion_persona: dict,
+    al_clic: callable = lambda _: None,
     **parametros
 ) -> ft.Container:
     """ Función: NodoPersona
@@ -16,15 +19,17 @@ def nodo_persona(
     relaciones. Trayendo la foto de perfil de la persona en un
     círculo, y el nombre completo debajo de la foto.
     """
+    persona = relacion_persona.get('persona')
     return ft.Container(
         content=ft.Column(
             controls=[
                 ft.Container(
                     content=persona.foto_perfil(25),
                     tooltip=persona.nombre_completo(),
+                    on_click=None if relacion_persona.get('rol') == 'Raíz' else al_clic,
                 ),
                 ft.Text(
-                    rol,
+                    relacion_persona.get('rol', 'Relacionado'),
                     size=12,
                     weight=ft.FontWeight.BOLD,
                     text_align=ft.TextAlign.CENTER,
@@ -74,8 +79,9 @@ class ArbolPersona(ft.Container):
      - Entre cada nodo de persona se muestran una línea (por lo que
         no se usa una tabla)
     """
-    def __init__(self, arbol: ArbolRelaciones):
+    def __init__(self, pagina: ft.Page, arbol: ArbolRelaciones):
         super().__init__()
+        self.pagina = pagina
         self._arbol: ArbolRelaciones = arbol
         self._persona: Persona = arbol.persona
 
@@ -92,7 +98,7 @@ class ArbolPersona(ft.Container):
         return ft.Row(
             controls=[
                 nodo_persona(
-                    self._persona,
+                    {'persona': self._persona, 'rol': 'Raíz'},
                     expand=1,
                 ),
                 *[
@@ -135,7 +141,7 @@ class ArbolPersona(ft.Container):
                                     ft.Column(
                                         [
                                             nodo_relacion(relacion_persona.get('nombre', 'Desconocido'), tipo),
-                                            nodo_persona(relacion_persona.get('persona'), relacion_persona.get('rol', 'Relacionado')),
+                                            nodo_persona(relacion_persona, al_clic=lambda _: self._al_clic_nodo_persona(relacion_persona)),
                                         ],
                                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                     )
@@ -168,4 +174,49 @@ class ArbolPersona(ft.Container):
             ],
             spacing=0,
             scroll=ft.ScrollMode.AUTO,
+        )
+
+    def _al_clic_nodo_persona(self, relacion_persona):
+        self.pagina.show_dialog(
+            ft.AlertDialog(
+                title=ft.Text("¿Qué acción deseas realizar?"),
+                content=ft.Container(
+                    content=ft.Column(
+                        controls=[
+                            ft.Container(
+                                ft.Text(
+                                    f"Ver perfil ({relacion_persona.get('persona').nombre_completo()})",
+                                    size=16,
+                                ),
+                                on_click=lambda _: asyncio.create_task(
+                                    self.pagina.push_route(rutas[etiquetas['DETAIL']](relacion_persona.get('persona').id))
+                                ),
+                            ),
+                            ft.Container(
+                                ft.Text(
+                                    f"Ver relación ({relacion_persona.get('nombre', 'Desconocido')})",
+                                    size=16,
+                                ),
+                                on_click=lambda _: asyncio.create_task(
+                                    self.pagina.push_route(rutas['relacion'](relacion_persona.get('id')))
+                                ),
+                            ),
+                        ],
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        spacing=15,
+                        tight=True,
+                    ),
+                ),
+                actions=[
+                    ft.TextButton(
+                        "Cerrar",
+                        on_click=lambda _: self.pagina.pop_dialog(),
+                        style=ft.ButtonStyle(
+                            color=ft.Colors.GREY_500,
+                        )
+                    ),
+                ],
+                actions_alignment=ft.MainAxisAlignment.CENTER,
+                modal=True,
+            )
         )

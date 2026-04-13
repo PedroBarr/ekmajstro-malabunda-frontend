@@ -225,6 +225,7 @@ class ClienteAPI:
             
             relaciones[relacion] = [
                 {
+                    'id': relacion_persona.get('id'),
                     'persona': Persona(
                         _id=relacion_persona.get('personaId').get('_id'),
                         nombre=relacion_persona.get('personaId').get('nombre'),

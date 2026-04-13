@@ -591,7 +591,7 @@ class PersonaVista:
                 mensaje="No hay relaciones para mostrar.",
             )
             if not self._arbol
-            else ArbolPersona(arbol=self._arbol).construir()
+            else ArbolPersona(pagina=self.pagina, arbol=self._arbol).construir()
         )
     
     def _grafo3d_componente(self):

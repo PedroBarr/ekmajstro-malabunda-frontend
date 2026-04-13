@@ -26,7 +26,7 @@ def nodo_persona(
                 ft.Container(
                     content=persona.foto_perfil(25),
                     tooltip=persona.nombre_completo(),
-                    on_click=None if relacion_persona.get('rol') == 'Raíz' else al_clic,
+                    on_click=None if relacion_persona.get('rol') == 'Raíz' else lambda e: al_clic(relacion_persona),
                 ),
                 ft.Text(
                     relacion_persona.get('rol', 'Relacionado'),
@@ -141,7 +141,7 @@ class ArbolPersona(ft.Container):
                                     ft.Column(
                                         [
                                             nodo_relacion(relacion_persona.get('nombre', 'Desconocido'), tipo),
-                                            nodo_persona(relacion_persona, al_clic=lambda _: self._al_clic_nodo_persona(relacion_persona)),
+                                            nodo_persona(relacion_persona, al_clic=lambda relacion: self._al_clic_nodo_persona(relacion)),
                                         ],
                                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                     )

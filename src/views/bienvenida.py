@@ -58,28 +58,90 @@ async def Bienvenida(pagina: ft.Page):
 
     return ft.View(
         route=ruta,
-        controls=[ft.Row(
-            [ft.Column(
+        controls=[
+            ft.Row(
                 [
-                    elemento_bienvenida,
-                    ft.Text(
-                        etiquetas["WELCOME_DESCRIPTION"],
-                        size=16,
-                    ),
-                    ft.Button(
-                        etiquetas["GOTO"](etiquetas["LIST_TITLE"]),
-                        icon=ft.Icons.LIST,
-                        on_click=ir_a_lista,
-                        height=50,
-                        color=ft.Colors.ON_PRIMARY,
+                    ft.Column(
+                        [
+                            ft.Image(
+                                src="favicon.png",
+                                width=300,
+                                height=300,
+                                color=ft.Colors.with_opacity(0.75, ft.Colors.WHITE),
+                            ),
+                            elemento_bienvenida,
+                            ft.Text(
+                                etiquetas["WELCOME_DESCRIPTION"],
+                                size=16,
+                                text_align=ft.TextAlign.JUSTIFY,
+                                width=pagina.width * 0.8,
+                            ),
+                            ft.Row(
+                                [
+                                    ft.Container(
+                                        content=ft.Column(
+                                            controls=[
+                                                ft.CircleAvatar(
+                                                    content=ft.Icon(
+                                                        ft.Icons.PERSON_2_ROUNDED,
+                                                        color=ft.Colors.ON_PRIMARY
+                                                    ),
+                                                    bgcolor=ft.Colors.PRIMARY,
+                                                ), ft.Text(
+                                                    etiquetas["GOTO"](etiquetas["LIST_TITLE"]),
+                                                    color=ft.Colors.ON_PRIMARY,
+                                                ),
+                                                ft.Container(height=10),
+                                            ],
+                                            alignment=ft.MainAxisAlignment.CENTER,
+                                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                            spacing=20,
+                                            tight=True,
+                                        ),
+                                        on_click=ir_a_lista,
+                                        padding=ft.Padding.symmetric(horizontal=15, vertical=20),
+                                        bgcolor=ft.Colors.ON_ERROR,
+                                        border_radius=15,
+                                        border=ft.Border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.ON_PRIMARY)),
+                                        shadow=ft.BoxShadow(
+                                            color=ft.Colors.with_opacity(
+                                                0.1, ft.Colors.BLACK
+                                            ),
+                                            blur_radius=9,
+                                            spread_radius=9,
+                                        ),
+                                    ),
+                                ],
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                spacing=20,
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        spacing=30,
                     ),
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                spacing=30,
-            ),],
-            alignment=ft.MainAxisAlignment.CENTER,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            expand=True,
-        )],
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                expand=True,
+            ),
+        ],
+        bottom_appbar=ft.BottomAppBar(
+            content=ft.Row(
+                controls=[
+                    ft.Text("Desarrollado por Alta Lengua"),
+                    ft.Text("·", size=30, width=20, text_align=ft.TextAlign.CENTER),
+                    ft.Text("2026"),
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=5,
+            ),
+            bgcolor=ft.Colors.TRANSPARENT,
+            notch_margin=0,
+            padding=0,
+            margin=0,
+            height=50,
+        ),
     )

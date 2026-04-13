@@ -27,7 +27,7 @@ etiquetas = {
     "ERROR_LOADING_CONFIG": "Error. API no disponible.",
 
     "WELCOME_MESSAGE": lambda nombre: f"Bienvenido al Sistema {nombre}",
-    "WELCOME_DESCRIPTION": "Explora una de las siguientes opciones",
+    "WELCOME_DESCRIPTION": "Usa las opciones de navegación para explorar la aplicación y acceder a las funcionalidades disponibles.\n\nEsta aplicación está en fase de desarrollo aún, por lo que algunas funciones pueden no estar disponibles o pueden presentar errores. Agradecemos tu comprensión y paciencia mientras seguimos trabajando para mejorar la experiencia del usuario.\n",
     "GOTO": lambda destino: f"Ir a {destino}",
 
     "LIST_TITLE": "Lista de Personas",

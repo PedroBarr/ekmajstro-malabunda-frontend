@@ -308,7 +308,7 @@ class Grafo3D(ft.Container):
 
         self._canvas.shapes.extend(ejes)
 
-    def dibujar_nodo(self, nodo: Nodo):
+    def dibujar_nodo(self, nodo: Nodo, lazo: Lazo = None):
         proyeccion = self._proyectar(nodo.x, nodo.y, nodo.z, incluir_z_ord=True)
 
         representacion = {
@@ -330,11 +330,12 @@ class Grafo3D(ft.Container):
         
         self._instrucciones_representacion.append(representacion)
 
-        self._agregar_colision_nodo(representacion, nodo)
+        self._agregar_colision_nodo(representacion, nodo, lazo=lazo)
 
-    def _agregar_colision_nodo(self, representacion, nodo):
+    def _agregar_colision_nodo(self, representacion, nodo, lazo=None):
         colision = {
             'nodo': nodo,
+            'lazo': lazo,
             'representacion': representacion
         }
 
@@ -381,7 +382,7 @@ class Grafo3D(ft.Container):
 
         self._instrucciones_representacion.append(representacion)
 
-        self.dibujar_nodo(nodo_conectado)
+        self.dibujar_nodo(nodo_conectado, lazo=lazo)
 
         contador_tipos_relaciones[tipo] += 1
 
@@ -495,13 +496,22 @@ class Grafo3D(ft.Container):
             tope, bajo, diestra, siniestra = map(float, caja_colision.split(':'))
             if siniestra <= x <= diestra and tope <= y <= bajo:
                 nodo = colision['nodo']
-
+                lazo = colision.get('lazo', None)
                 info = nodo.i
 
-                self._bocadillo.content = self._construir_bocadillo_info(nodo, info)
+                self._bocadillo.content = self._construir_bocadillo_info(nodo, info, lazo=lazo)
                 self._bocadillo.x = 10
                 self._bocadillo.y = 10
                 self._bocadillo.visible = True
+                if lazo:
+                    self._bocadillo.bgcolor = ft.Colors.with_opacity(
+                        0.5,
+                        estilos_config['tipos_relacion'].get(
+                            lazo.i.get('tipo', 'desconocido'), {}
+                        ).get('borde', ft.Colors.GREY)
+                    )
+                else:
+                    self._bocadillo.bgcolor = ft.Colors.with_opacity(0.5, ft.Colors.BLACK)
 
                 self._ultimo_bocadillo = time.time()
                 colisiono = True
@@ -520,7 +530,7 @@ class Grafo3D(ft.Container):
     async def _pos_clic_derecho(self, evento: ft.ControlEventHandler):
         await ft.BrowserContextMenu().enable()
 
-    def _construir_bocadillo_info(self, nodo: Nodo, info: Dict):
+    def _construir_bocadillo_info(self, nodo: Nodo, info: Dict, lazo: Lazo = None):
         return ft.Column(
             controls=[
                 ft.Text(
@@ -529,14 +539,14 @@ class Grafo3D(ft.Container):
                     size=18,
                     weight=ft.FontWeight.BOLD
                 ),
-                ft.Text(f"ID: {nodo.id}", color=ft.Colors.WHITE_70, size=12),
+                ft.Text(lazo.i.get('nombreRelacion', '') if lazo else "Nodo central", color=ft.Colors.WHITE_70, size=12),
                 ft.Row(
                     controls=[
                         ft.Container(
                             width=self._dimensiones[0] // 8,
                         ),
                         ft.Button(
-                            "Ver detalles",
+                            "Ver perfil",
                             on_click=lambda e: self._al_ver_detalles(info.get('_id', None)),
                             bgcolor=ft.Colors.PRIMARY,
                             color=ft.Colors.WHITE,

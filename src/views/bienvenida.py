@@ -131,12 +131,17 @@ async def Bienvenida(pagina: ft.Page):
             content=ft.Row(
                 controls=[
                     ft.Text("Desarrollado por Alta Lengua"),
-                    ft.Text("·", size=30, width=20, text_align=ft.TextAlign.CENTER),
+                    ft.Image(
+                        src="al.svg",
+                        width=20,
+                        height=20,
+                        color=ft.Colors.WHITE,
+                    ),
                     ft.Text("2026"),
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                spacing=5,
+                spacing=15,
             ),
             bgcolor=ft.Colors.TRANSPARENT,
             notch_margin=0,

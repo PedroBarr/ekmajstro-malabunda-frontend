@@ -34,7 +34,7 @@ def fila_lista(
                 ft.Column(
                     [
                         ft.Text(
-                            f'{persona.apellido}, {persona.nombre}',
+                            persona.nombre_completo(),
                             size=19,
                             weight=ft.FontWeight.W_900,
                             color=ft.Colors.GREY_400,

@@ -19,7 +19,10 @@ def nodo_persona(
     return ft.Container(
         content=ft.Column(
             controls=[
-                persona.foto_perfil(25),
+                ft.Container(
+                    content=persona.foto_perfil(25),
+                    tooltip=persona.nombre_completo(),
+                ),
                 ft.Text(
                     rol,
                     size=12,
@@ -47,6 +50,7 @@ def nodo_relacion(texto: str, tipo: str = "", **parametros) -> ft.Container:
             size=12,
             weight=ft.FontWeight.BOLD,
             color=ft.Colors.WHITE,
+            text_align=ft.TextAlign.CENTER,
         ),
         padding=10,
         bgcolor=estilos_config['tipos_relacion'].get(tipo, {}).get('borde', ft.Colors.GREY_500),

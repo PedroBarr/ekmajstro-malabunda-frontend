@@ -187,6 +187,9 @@ class Persona(BaseModel):
             modificado=_modificado,
         )
     
+    def nombre_completo(self) -> str:
+        return f"{self.nombre} {self.apellido}".strip()
+    
 class PersonaElemento(Persona):
     """ Clase: PersonaElemento
         (Persona)

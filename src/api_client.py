@@ -233,6 +233,7 @@ class ClienteAPI:
                     ),
                     'fecha': relacion_persona.get('fecha', None),
                     'nombre': relacion_persona.get('nombreRelacion', ""),
+                    'rol': relacion_persona.get('rol', "Relacionado"),
                 }
                 for relacion_persona in respuesta.json()[relacion]
             ]

@@ -5,7 +5,11 @@ from models.arbol_relaciones import ArbolRelaciones
 
 from themes import estilos_config
 
-def nodo_persona(persona: Persona, **parametros) -> ft.Container:
+def nodo_persona(
+    persona: Persona,
+    rol: str = "Relacionado",
+    **parametros
+) -> ft.Container:
     """ Función: NodoPersona
 
     Componente para construir un nodo de persona en el árbol de
@@ -17,10 +21,11 @@ def nodo_persona(persona: Persona, **parametros) -> ft.Container:
             controls=[
                 persona.foto_perfil(25),
                 ft.Text(
-                    f"{persona.nombre} {persona.apellido}",
+                    rol,
                     size=12,
                     weight=ft.FontWeight.BOLD,
                     text_align=ft.TextAlign.CENTER,
+                    overflow=ft.TextOverflow.ELLIPSIS,
                 )
             ],
              spacing=5,
@@ -126,7 +131,7 @@ class ArbolPersona(ft.Container):
                                     ft.Column(
                                         [
                                             nodo_relacion(relacion_persona.get('nombre', 'Desconocido'), tipo),
-                                            nodo_persona(relacion_persona.get('persona')),
+                                            nodo_persona(relacion_persona.get('persona'), relacion_persona.get('rol', 'Relacionado')),
                                         ],
                                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                     )

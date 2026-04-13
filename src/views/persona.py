@@ -608,11 +608,17 @@ class PersonaVista:
                 ),
                 angulo_elevacion_inicial=75,
                 al_repintar=lambda: self.pagina.update(),
-                al_ver_detalles=lambda id: \
-                    asyncio.create_task(self.pagina.push_route(rutas[etiquetas["DETAIL"]](id))),
+                al_ver_detalles=self._ver_detalles,
             )\
                 .construir()
         )
+    
+    def _ver_detalles(self, id: str, tipo: str = "persona"):
+        if tipo == "persona":
+            asyncio.create_task(self.pagina.push_route(rutas[etiquetas["DETAIL"]](id)))
+        elif tipo == "relacion":
+            asyncio.create_task(self.pagina.push_route(rutas['relacion'](id)))
+
 
     def _actualizar_personas(self, personas: list[PersonaElemento]):
         self._personas = personas

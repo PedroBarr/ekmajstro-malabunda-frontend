@@ -543,7 +543,15 @@ class Grafo3D(ft.Container):
                 ft.Row(
                     controls=[
                         ft.Container(
-                            width=self._dimensiones[0] // 8,
+                            width=self._dimensiones[0] // 6,
+                        ),
+                        (
+                            ft.Button(
+                                "Ver relación",
+                                on_click=lambda e: self._al_ver_detalles(lazo.i.get('id', None), tipo="relacion"),
+                                bgcolor=ft.Colors.PRIMARY,
+                                color=ft.Colors.WHITE,
+                            ) if lazo else ft.Container()
                         ),
                         ft.Button(
                             "Ver perfil",
